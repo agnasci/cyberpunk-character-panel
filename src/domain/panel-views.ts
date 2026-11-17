@@ -1,3 +1,4 @@
+import type { StyleView } from "./style-view";
 import {
   buildLedgerViews,
   type DrugEntry,
@@ -19,7 +20,7 @@ import {
   type StatEntry,
 } from "./sheet-lists";
 
-export type DrawerId = "skills" | "roles" | "net" | "sheet" | "health";
+export type DrawerId = "skills" | "roles" | "net" | "sheet" | "health" | "style";
 
 export interface HealthView {
   injuries: (InjuryEntry & { locationKey: string })[];
@@ -62,6 +63,7 @@ export interface DrawerView {
   net: (NetEntry & { abilities: InterfaceView[] }) | null;
   ledgers: LedgerView[] | null;
   health: HealthView | null;
+  style: StyleView | null;
 }
 
 export interface ActionsView {
@@ -111,6 +113,7 @@ export function buildDrawerView(
     drugs?: readonly DrugEntry[] | undefined;
     effects?: readonly EffectEntry[] | undefined;
     statuses?: readonly StatusEntry[] | undefined;
+    style?: StyleView | undefined;
   },
 ): DrawerView {
   const skills =
@@ -143,7 +146,8 @@ export function buildDrawerView(
           statuses: [...(source.statuses ?? [])],
         }
       : null;
-  return { open, skills, roles, net, ledgers, health };
+  const style = open === "style" ? (source.style ?? null) : null;
+  return { open, skills, roles, net, ledgers, health, style };
 }
 
 export function buildActionsView(
@@ -165,6 +169,7 @@ export function buildActionsView(
     net: hasNet,
     sheet: hasSheet,
     health: true,
+    style: true,
   };
   return {
     open: open && available[open] ? open : null,

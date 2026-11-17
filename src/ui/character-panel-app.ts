@@ -46,7 +46,16 @@ import {
   planLedgerChange,
 } from "../domain/quick-sheet";
 import type { ResolvedSubject } from "../integrations/cpr/subject-resolver";
-import { type PanelSettings, saveCollapsed } from "../settings";
+import { buildPalette, normalizeHex, paletteVariables } from "../domain/palette";
+import { buildStyleView, styleNote } from "../domain/style-view";
+import {
+  type PanelSettings,
+  type PreferenceKey,
+  saveAccent,
+  saveCollapsed,
+  savePreference,
+  saveWorldAccent,
+} from "../settings";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -88,6 +97,12 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
       toggleEffect: CharacterPanelApp.#onToggleEffect,
       openEffect: CharacterPanelApp.#onOpenEffect,
       toggleStatus: CharacterPanelApp.#onToggleStatus,
+      previewAccent: CharacterPanelApp.#onPreviewAccent,
+      saveAccent: CharacterPanelApp.#onSaveAccent,
+      resetAccent: CharacterPanelApp.#onResetAccent,
+      saveWorldAccent: CharacterPanelApp.#onSaveWorldAccent,
+      togglePref: CharacterPanelApp.#onTogglePref,
+      setDock: CharacterPanelApp.#onSetDock,
     },
   };
 
@@ -110,6 +125,7 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
   #refocus: string | null = null;
   #drawer: DrawerId | null = null;
   #skillQuery = "";
+  #preview: string | null = null;
   #resizer: ResizeObserver | null = null;
   #observed: HTMLElement | null = null;
   #flush = foundry.utils.debounce(() => void this.#renderPending(), DIRTY_DELAY_MS);
@@ -209,9 +225,15 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
         drugs: open === "health" ? readDrugs(actor) : undefined,
         effects: open === "health" ? readEffects(actor) : undefined,
         statuses: open === "health" ? readStatuses(actor) : undefined,
+        style: open === "style" ? this.#styleView() : undefined,
       });
       const empty =
-        !drawer.skills && !drawer.roles && !drawer.net && !drawer.ledgers && !drawer.health;
+        !drawer.skills &&
+        !drawer.roles &&
+        !drawer.net &&
+        !drawer.ledgers &&
+        !drawer.health &&
+        !drawer.style;
       return { ...base, drawer: empty ? { ...drawer, open: null } : drawer };
     }
     return base;
@@ -247,6 +269,7 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
     if (vitals?.state) this.element.dataset.vital = vitals.state;
     this.#applyRootState(context.hasSubject === true);
     this.#bindSkillSearch();
+    this.#bindStyleEditor();
     this.#observeWidth();
     if (this.#refocus) {
       const target = document.getElementById(this.#refocus);
@@ -274,6 +297,84 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
     if (width === 0) return;
     root.classList.toggle("ccp-narrow", width < NARROW_WIDTH);
     root.classList.toggle("ccp-tiny", width < TINY_WIDTH);
+  }
+
+  #styleView() {
+    return buildStyleView({
+      accent: this.#settings.accent,
+      preview: this.#preview,
+      accentOverride: this.#settings.accentOverride,
+      worldAccent: this.#settings.worldAccent,
+      isGM: game.user.isGM,
+      compact: this.#settings.compact,
+      showFavorites: this.#settings.showFavorites,
+      showBpm: this.#settings.showBpm,
+      animateMonitor: this.#settings.animateMonitor,
+      dock: this.#settings.dock,
+    });
+  }
+
+  #applyPalette(hex: string): void {
+    const root = this.element;
+    if (!root) return;
+    for (const [name, value] of Object.entries(paletteVariables(buildPalette(hex)))) {
+      root.style.setProperty(name, value);
+    }
+  }
+
+  #setPreview(hex: string | null, rerender: boolean): void {
+    this.#preview = hex;
+    this.#applyPalette(hex ?? this.#settings.accent);
+    if (rerender) void this.render({ parts: ["drawer"] });
+    else this.#updateStyleNote(hex ?? this.#settings.accent);
+  }
+
+  #updateStyleNote(hex: string): void {
+    const drawer = this.element.querySelector<HTMLElement>(".ccp-style");
+    if (!drawer) return;
+    const note = styleNote(hex);
+    const contrast = drawer.querySelector<HTMLElement>(".ccp-style-contrast");
+    if (contrast) {
+      contrast.textContent = game.i18n.format("CCP.Style.Contrast", {
+        ratio: note.inkContrast.toFixed(1),
+      });
+    }
+    const conflict = drawer.querySelector<HTMLElement>(".ccp-style-conflict");
+    if (conflict) {
+      conflict.hidden = note.conflictKeys.length === 0;
+      conflict.textContent = game.i18n.format("CCP.Style.Conflict", {
+        states: note.conflictKeys.map((k) => game.i18n.localize(k)).join(", "),
+      });
+    }
+    const hexInput = drawer.querySelector<HTMLInputElement>("#ccp-accent-hex");
+    if (hexInput && document.activeElement !== hexInput) hexInput.value = hex;
+    for (const swatch of drawer.querySelectorAll<HTMLElement>(".ccp-swatch")) {
+      swatch.setAttribute("aria-pressed", String(swatch.dataset.hex === hex));
+    }
+    drawer
+      .querySelector<HTMLElement>(".ccp-style-save")
+      ?.toggleAttribute("data-dirty", hex !== this.#settings.accent);
+  }
+
+  #bindStyleEditor(): void {
+    if (this.element.querySelector(".ccp-style")) {
+      this.#updateStyleNote(this.#preview ?? this.#settings.accent);
+    }
+    const picker = this.element.querySelector<HTMLInputElement>("#ccp-accent-picker");
+    if (picker && picker.dataset.bound !== "1") {
+      picker.dataset.bound = "1";
+      picker.addEventListener("input", () => this.#setPreview(normalizeHex(picker.value), false));
+    }
+    const hex = this.element.querySelector<HTMLInputElement>("#ccp-accent-hex");
+    if (hex && hex.dataset.bound !== "1") {
+      hex.dataset.bound = "1";
+      hex.addEventListener("keydown", (event) => event.stopPropagation());
+      hex.addEventListener("change", () => {
+        const value = normalizeHex(hex.value);
+        if (value) this.#setPreview(value, true);
+        else hex.value = this.#preview ?? this.#settings.accent;
+      });
+    }
   }
 
   #bindSkillSearch(): void {
@@ -331,6 +432,10 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
     root.classList.toggle("ccp-collapsed", this.#settings.collapsed);
     root.classList.toggle("ccp-dock-top", this.#settings.dock === "top");
     root.style.setProperty("--ccp-scale", String(this.#settings.scale));
+    root.classList.toggle("ccp-compact", this.#settings.compact);
+    root.classList.toggle("ccp-no-favs", !this.#settings.showFavorites);
+    root.classList.toggle("ccp-no-bpm", !this.#settings.showBpm);
+    this.#applyPalette(this.#preview ?? this.#settings.accent);
     this.#applyMotion();
     const toggle = root.querySelector<HTMLElement>("[data-action='toggleCollapse']");
     if (toggle) {
@@ -469,8 +574,12 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
     const id = target.dataset.drawer as DrawerId | undefined;
     if (!id) return;
     this.#drawer = this.#drawer === id ? null : id;
+    if (this.#drawer !== "style" && this.#preview !== null) {
+      this.#preview = null;
+      this.#applyPalette(this.#settings.accent);
+    }
     this.#refocus = target.id;
-    await this.render({ parts: ["drawer", "actions"] });
+    await this.render({ parts: ["drawer", "actions", "dock"] });
   }
 
   static async #onRollSkill(this: CharacterPanelApp, event: Event, target: HTMLElement) {
@@ -554,5 +663,45 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
     const actor = this.#actor();
     const id = target.dataset.statusId;
     if (actor && id) await toggleStatus(actor, id);
+  }
+
+  static #onPreviewAccent(this: CharacterPanelApp, _event: Event, target: HTMLElement): void {
+    const hex = normalizeHex(target.dataset.hex ?? "");
+    if (hex) this.#setPreview(hex, true);
+  }
+
+  static async #onSaveAccent(this: CharacterPanelApp): Promise<void> {
+    const hex = this.#preview ?? this.#settings.accent;
+    this.#preview = null;
+    this.#refocus = "ccp-style-save";
+    await saveAccent(hex === this.#settings.worldAccent ? null : hex);
+  }
+
+  static async #onResetAccent(this: CharacterPanelApp): Promise<void> {
+    this.#preview = null;
+    this.#refocus = "ccp-style-reset";
+    await saveAccent(null);
+  }
+
+  static async #onSaveWorldAccent(this: CharacterPanelApp): Promise<void> {
+    if (!game.user.isGM) return;
+    const hex = this.#preview ?? this.#settings.accent;
+    this.#preview = null;
+    this.#refocus = "ccp-style-world";
+    await saveWorldAccent(hex);
+    if (this.#settings.accentOverride === hex) await saveAccent(null);
+  }
+
+  static async #onTogglePref(this: CharacterPanelApp, _event: Event, target: HTMLElement) {
+    const key = target.dataset.pref as PreferenceKey | undefined;
+    if (!key || key === "dock") return;
+    this.#refocus = target.id;
+    await savePreference(key, !this.#settings[key]);
+  }
+
+  static async #onSetDock(this: CharacterPanelApp, _event: Event, target: HTMLElement) {
+    const dock = target.dataset.dock === "top" ? "top" : "bottom";
+    this.#refocus = target.id;
+    if (dock !== this.#settings.dock) await savePreference("dock", dock);
   }
 }

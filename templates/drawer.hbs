@@ -119,4 +119,47 @@
     </div>
   </div>
   {{/if}}
+  {{#if drawer.style}}
+  <header>
+    <h2>{{localize "CCP.Style.Title"}}</h2>
+    <span class="ccp-note">{{#if drawer.style.isOverride}}{{localize "CCP.Style.Personal"}}{{else}}{{localize "CCP.Style.WorldDefault"}}{{/if}}</span>
+  </header>
+  <div class="ccp-style">
+    <div class="ccp-style-col">
+      <h3>{{localize "CCP.Style.Accent"}}</h3>
+      <div class="ccp-swatches" role="group" aria-label="{{localize 'CCP.Style.Presets'}}">
+        {{#each drawer.style.presets}}
+        <button type="button" id="ccp-swatch-{{id}}" class="ccp-swatch" data-action="previewAccent" data-hex="{{hex}}" style="--ccp-swatch: {{hex}}" aria-pressed="{{#if pressed}}true{{else}}false{{/if}}" aria-label="{{localize labelKey}}" data-tooltip="{{localize labelKey}}"></button>
+        {{/each}}
+      </div>
+      <div class="ccp-picker">
+        <input type="color" id="ccp-accent-picker" value="{{drawer.style.accent}}" aria-label="{{localize 'CCP.Style.Picker'}}">
+        <input type="text" id="ccp-accent-hex" value="{{drawer.style.accent}}" aria-label="{{localize 'CCP.Style.Hex'}}" spellcheck="false" autocomplete="off" maxlength="7">
+      </div>
+      <p class="ccp-style-contrast ccp-note">{{localize "CCP.Style.Contrast" ratio=drawer.style.inkContrast}}</p>
+      <p class="ccp-style-conflict" role="status" hidden></p>
+      <div class="ccp-style-actions">
+        <button type="button" id="ccp-style-save" class="ccp-key ccp-chamfer ccp-style-save" data-action="saveAccent" {{#if drawer.style.dirty}}data-dirty{{/if}}><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>{{localize "CCP.Style.Save"}}</button>
+        <button type="button" id="ccp-style-reset" class="ccp-key ccp-chamfer" data-action="resetAccent" {{#unless drawer.style.isOverride}}disabled{{/unless}}><i class="fa-solid fa-rotate-left" aria-hidden="true"></i>{{localize "CCP.Style.Reset"}}</button>
+        {{#if drawer.style.isGM}}
+        <button type="button" id="ccp-style-world" class="ccp-key ccp-chamfer" data-action="saveWorldAccent"><i class="fa-solid fa-globe" aria-hidden="true"></i>{{localize "CCP.Style.SetWorld"}}</button>
+        {{/if}}
+      </div>
+    </div>
+    <div class="ccp-style-col">
+      <h3>{{localize "CCP.Style.Layout"}}</h3>
+      {{#each drawer.style.prefs}}
+      <button type="button" id="ccp-pref-{{key}}" class="ccp-row ccp-pref" data-action="togglePref" data-pref="{{key}}" role="switch" aria-checked="{{#if on}}true{{else}}false{{/if}}">
+        <span>{{localize labelKey}}</span>
+        <i class="fa-solid {{#if on}}fa-toggle-on{{else}}fa-toggle-off{{/if}}" aria-hidden="true"></i>
+      </button>
+      {{/each}}
+      <div class="ccp-dock-choice" role="group" aria-label="{{localize 'CCP.Settings.dock.Name'}}">
+        <span>{{localize "CCP.Settings.dock.Name"}}</span>
+        <button type="button" id="ccp-dock-bottom" class="ccp-step ccp-chamfer" data-action="setDock" data-dock="bottom" aria-pressed="{{#if (eq drawer.style.dock 'bottom')}}true{{else}}false{{/if}}">{{localize "CCP.Settings.dock.Bottom"}}</button>
+        <button type="button" id="ccp-dock-top" class="ccp-step ccp-chamfer" data-action="setDock" data-dock="top" aria-pressed="{{#if (eq drawer.style.dock 'top')}}true{{else}}false{{/if}}">{{localize "CCP.Settings.dock.Top"}}</button>
+      </div>
+    </div>
+  </div>
+  {{/if}}
 </section>

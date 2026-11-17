@@ -1,4 +1,9 @@
 <section class="ccp-dock">
+  {{#if hasSubject}}
+  <button type="button" id="ccp-key-style" class="ccp-icon-btn ccp-chamfer ccp-style-btn" data-action="toggleDrawer" data-drawer="style" aria-label="{{localize 'CCP.Style.Open'}}" data-tooltip="{{localize 'CCP.Style.Open'}}" aria-controls="ccp-drawer">
+    <i class="fa-solid fa-palette" aria-hidden="true"></i>
+  </button>
+  {{/if}}
   <button type="button" class="ccp-icon-btn ccp-chamfer" data-action="toggleCollapse" aria-label="{{localize 'CCP.Panel.Collapse'}}" aria-expanded="true">
     <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
   </button>

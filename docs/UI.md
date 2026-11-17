@@ -60,8 +60,8 @@ gera as variáveis e calcula o contraste; testado sem Foundry.
 | `--ccp-bg`, `--ccp-surface`, `--ccp-text`, `--ccp-text-dim` | Fixas (tema escuro) |
 | `--ccp-ok`, `--ccp-warn`, `--ccp-serious`, `--ccp-critical`, `--ccp-dead` | Fixas, semânticas |
 
-Se o destaque escolhido ficar perto demais de uma cor semântica, o domínio sinaliza e a
-UI troca a cor de estado por uma variante distinguível (ou mostra aviso no editor).
+Se o destaque escolhido ficar perto demais de uma cor de ferimento, o domínio sinaliza, o
+batimento saudável passa a `--ccp-ok` e o editor avisa (D26). Implementado na E5.
 
 ### Color picker
 

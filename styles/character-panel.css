@@ -14,7 +14,8 @@
   --ccp-serious: #ff8a3d;
   --ccp-critical: #ff3b5c;
   --ccp-dead: #737a8c;
-  --ccp-vital: var(--ccp-accent);
+  --ccp-vital-ok: var(--ccp-accent);
+  --ccp-vital: var(--ccp-vital-ok);
   --ccp-font-display: "Tektur", "Jost", system-ui, sans-serif;
   --ccp-font-body: "Jost", "Signika", system-ui, sans-serif;
   --ccp-cut: 12px;
@@ -572,7 +573,10 @@
 
 .ccp-panel .ccp-dock {
   display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
+  gap: 6px;
   padding: 10px;
 }
 
@@ -1314,4 +1318,176 @@
 
 .ccp-panel .ccp-status:disabled {
   cursor: default;
+}
+
+.ccp-panel.ccp-collapsed .ccp-style-btn,
+.ccp-panel.ccp-no-bpm .ccp-bpm,
+.ccp-panel.ccp-no-favs .ccp-favs,
+.ccp-panel.ccp-compact > .ccp-stats,
+.ccp-panel.ccp-compact .ccp-alias,
+.ccp-panel.ccp-compact .ccp-minis {
+  display: none;
+}
+
+.ccp-panel.ccp-compact:not(.ccp-collapsed) {
+  grid-template-columns: auto minmax(260px, 1fr) auto;
+  grid-template-areas:
+    "drawer drawer drawer"
+    "identity vitals dock"
+    "actions actions actions";
+}
+
+.ccp-panel.ccp-compact.ccp-dock-top:not(.ccp-collapsed) {
+  grid-template-areas:
+    "actions actions actions"
+    "identity vitals dock"
+    "drawer drawer drawer";
+}
+
+.ccp-panel.ccp-compact.ccp-tiny:not(.ccp-collapsed) {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "drawer drawer"
+    "identity dock"
+    "vitals vitals"
+    "actions actions";
+}
+
+.ccp-panel .ccp-style {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.ccp-panel .ccp-style-col {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+}
+
+.ccp-panel .ccp-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ccp-panel .ccp-swatch {
+  all: unset;
+  box-sizing: border-box;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  background: var(--ccp-swatch);
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 0.4),
+    0 0 0 1px var(--ccp-line);
+}
+
+.ccp-panel .ccp-swatch[aria-pressed="true"] {
+  box-shadow:
+    inset 0 0 0 2px var(--ccp-bg),
+    0 0 0 2px var(--ccp-swatch);
+}
+
+.ccp-panel .ccp-swatch:focus-visible {
+  outline: 2px solid var(--ccp-text);
+  outline-offset: 2px;
+}
+
+.ccp-panel .ccp-picker {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.ccp-panel .ccp-picker input[type="color"] {
+  width: 40px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--ccp-line);
+  background: none;
+  cursor: pointer;
+}
+
+.ccp-panel .ccp-picker input[type="text"] {
+  box-sizing: border-box;
+  width: 7em;
+  height: 28px;
+  padding: 0 8px;
+  font-family: var(--ccp-font-display);
+  font-size: 13px;
+  text-transform: lowercase;
+  color: var(--ccp-text);
+  background: var(--ccp-surface);
+  border: 1px solid var(--ccp-line);
+  border-radius: 0;
+}
+
+.ccp-panel .ccp-picker input[type="text"]:focus {
+  border-color: var(--ccp-accent);
+  outline: none;
+}
+
+.ccp-panel .ccp-style p {
+  margin: 0;
+}
+
+.ccp-panel .ccp-style-conflict {
+  font-size: 12px;
+  color: var(--ccp-warn);
+}
+
+.ccp-panel .ccp-style-conflict[hidden] {
+  display: none;
+}
+
+.ccp-panel .ccp-style-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ccp-panel .ccp-style-save[data-dirty] {
+  color: var(--ccp-accent-ink);
+  background: var(--ccp-accent);
+}
+
+.ccp-panel .ccp-style-save[data-dirty] i {
+  color: var(--ccp-accent-ink);
+}
+
+.ccp-panel .ccp-pref {
+  cursor: pointer;
+}
+
+.ccp-panel .ccp-pref i {
+  font-size: 16px;
+  color: var(--ccp-text-dim);
+}
+
+.ccp-panel .ccp-pref[aria-checked="true"] i {
+  color: var(--ccp-accent);
+}
+
+.ccp-panel .ccp-pref:hover,
+.ccp-panel .ccp-pref:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--ccp-accent-line);
+}
+
+.ccp-panel .ccp-dock-choice {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--ccp-text-dim);
+}
+
+.ccp-panel .ccp-dock-choice span {
+  flex: 1;
+}
+
+.ccp-panel .ccp-dock-choice .ccp-step[aria-pressed="true"] {
+  color: var(--ccp-accent-ink);
+  background: var(--ccp-accent);
 }

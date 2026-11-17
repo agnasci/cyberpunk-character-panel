@@ -11,6 +11,11 @@ export const SETTINGS = {
   dock: "dock",
   collapsed: "collapsed",
   animateMonitor: "animateMonitor",
+  accent: "accent",
+  defaultAccent: "defaultAccent",
+  compact: "compact",
+  showFavorites: "showFavorites",
+  showBpm: "showBpm",
 } as const;
 
 export const KEYBINDING_TOGGLE = "togglePanel";

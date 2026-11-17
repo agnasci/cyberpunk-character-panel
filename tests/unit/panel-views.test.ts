@@ -57,6 +57,7 @@ describe("panel views", () => {
       net: null,
       ledgers: null,
       health: null,
+      style: null,
     });
     expect(buildDrawerView("roles", { roles }).roles?.map((r) => r.id)).toEqual(["r2"]);
     expect(buildDrawerView("skills", { skills }).skills?.[0]?.skills[0]).toMatchObject({

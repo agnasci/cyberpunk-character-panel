@@ -130,6 +130,11 @@ declare global {
       debounce<T extends (...args: never[]) => void>(fn: T, delay: number): T;
       flattenObject(obj: Record<string, unknown>): Record<string, unknown>;
     };
+    data: {
+      fields: {
+        ColorField: new (options?: Record<string, unknown>) => unknown;
+      };
+    };
     applications: {
       api: {
         ApplicationV2: typeof FoundryApplicationV2;

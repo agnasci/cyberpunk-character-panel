@@ -151,6 +151,15 @@ foi testado em execução no Netrunner HUD, não nesta etapa.
   cria/apaga o efeito do status, que dispara os hooks de efeito.
 - Digitar em `<input>` do painel não aciona atalhos do Foundry.
 
+## Fatos confirmados na E5 (testado em execução em 2026-11-16)
+
+- `new ColorField({nullable: true, blank: true, required: false, initial: null})` aceita `null`, `""`
+  e hex; registrado como ajuste de cliente, aparece como `<color-picker>` na configuração.
+- Ajuste `world` só aparece para o mestre; o `onChange` dele dispara em todos os clientes (a cor
+  padrão chegou ao painel do jogador sem recarregar).
+- `<input type="color">` dispara `input` a cada mudança; atualizar só variáveis CSS mantém o
+  seletor aberto (re-render da parte o fecharia).
+
 ## Fatos de dados confirmados em execução (E0-02)
 
 - Ator criado por `CONFIG.Actor.documentClass.create` (character ou mook) recebe 63 perícias
