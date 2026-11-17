@@ -8,7 +8,7 @@ Atualizado em: 2026-11-17.
   com editor próprio, cor padrão do mundo definida pelo mestre e preferências de layout.
 - Leiaute redesenhado em 2026-11-17 (D29–D43), validado pelo usuário em iterações no Foundry; o
   protótipo E0-03 (`prototype/panel.html`) ficou como referência histórica.
-- **v0.1.0 (beta) publicada em 2026-11-17** no GitHub, repositório tornado público. Manifesto:
+- **v0.1.0 (beta) publicada em 2026-11-17** no GitHub, repositório tornado público; **v0.1.1** (FIX-01) no mesmo dia. Manifesto:
   <https://github.com/agnasci/cyberpunk-character-panel/releases/latest/download/module.json>.
   Sem página no site do Foundry ainda.
 - Repositório privado: <https://github.com/agnasci/cyberpunk-character-panel> (`main`); E4 em `2f31f4c`.
