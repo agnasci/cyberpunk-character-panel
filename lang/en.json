@@ -1,4 +1,22 @@
 {
   "CCP.Compat.WrongSystem": "Character Panel requires the Cyberpunk RED – CORE system.",
-  "CCP.Compat.UntestedVersion": "Character Panel was tested with Cyberpunk RED – CORE {tested}; this world uses {found}."
+  "CCP.Compat.UntestedVersion": "Character Panel was tested with Cyberpunk RED – CORE {tested}; this world uses {found}.",
+  "CCP.Panel.OpenSheet": "Open character sheet",
+  "CCP.Panel.Collapse": "Collapse panel",
+  "CCP.Panel.Expand": "Expand panel",
+  "CCP.Vital.HP": "HP",
+  "CCP.Vital.Dead": "Dead",
+  "CCP.Vital.Unknown": "HP unavailable",
+  "CCP.Settings.enabled.Name": "Show character panel",
+  "CCP.Settings.enabled.Hint": "Show the always-on character panel for your character.",
+  "CCP.Settings.followControlled.Name": "Follow selected token",
+  "CCP.Settings.followControlled.Hint": "When you select a token you own, show it instead of your assigned character.",
+  "CCP.Settings.scale.Name": "Panel scale",
+  "CCP.Settings.scale.Hint": "Overall size of the character panel.",
+  "CCP.Settings.dock.Name": "Panel position",
+  "CCP.Settings.dock.Hint": "Screen edge where the panel is docked.",
+  "CCP.Settings.dock.Bottom": "Bottom",
+  "CCP.Settings.dock.Top": "Top",
+  "CCP.Keybinding.Toggle.Name": "Collapse or expand character panel",
+  "CCP.Keybinding.Toggle.Hint": "Collapse the character panel to a slim bar, or expand it again."
 }

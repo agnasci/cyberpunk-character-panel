@@ -1,0 +1,17 @@
+<section class="ccp-vitals">
+  {{#if hasSubject}}
+  <div class="ccp-wound">{{localize vitals.stateLabelKey}}</div>
+  <div class="ccp-hp-row">
+    <span class="ccp-hp-label">{{localize "CCP.Vital.HP"}}</span>
+    {{#if vitals.hp}}
+    <div class="ccp-hp-bar" role="meter" aria-label="{{localize 'CCP.Vital.HP'}}" aria-valuemin="0" aria-valuemax="{{vitals.hp.max}}" aria-valuenow="{{vitals.hp.value}}">
+      <div class="ccp-hp-fill" style="width: {{vitals.hp.percent}}%"></div>
+    </div>
+    <span class="ccp-hp-value">{{vitals.hp.value}}<small>/{{vitals.hp.max}}</small></span>
+    {{else}}
+    <div class="ccp-hp-bar"></div>
+    <span class="ccp-hp-value">—</span>
+    {{/if}}
+  </div>
+  {{/if}}
+</section>

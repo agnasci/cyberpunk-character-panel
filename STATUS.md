@@ -4,54 +4,55 @@ Atualizado em: 2026-11-16.
 
 ## Situação
 
-- E0 concluída (fundação). Nenhuma função do painel implementada ainda.
-- Git: repositório local iniciado, sem commit.
+- E0 e E1 concluídas. O painel existe: aparece sozinho para o personagem do jogador, mostra
+  identidade e HP/estado de ferimento, recolhe, e atualiza só a parte que mudou.
+- Protótipo visual (E0-03) aprovado pelo usuário em 2026-11-16: `prototype/panel.html`,
+  <https://claude.ai/artifact/UZxzG4ErvFhCc2L6mycLeY>.
+- Repositório privado: <https://github.com/agnasci/cyberpunk-character-panel> (`main`).
+- Estudo, provas de API e fatos verificados: docs/RESEARCH.md e docs/COMPATIBILITY.md.
 
-## E0-01 — ferramentas e módulo vazio (feito)
+## Última entrega: E1 — esqueleto do painel (2026-11-16)
 
-- `npm install` gerou `package-lock.json` (8 vulnerabilidades moderadas em dependências de dev,
-  como no Netrunner HUD). `src/main.ts` (aviso de compatibilidade no `ready`),
-  `src/constants.ts`, `src/compatibility.ts` (vindo do Netrunner HUD), `src/types/foundry.d.ts`
-  mínimo, `styles/character-panel.css`, `lang/*.json`, `tests/unit/compatibility.test.ts`.
-- `npm run check` exit 0 (3 testes). Junção criada:
-  `%LOCALAPPDATA%\FoundryVTT\Data\modules\cyberpunk-character-panel` → `dist/`.
-- Manual real (Foundry 12.343, CPR v0.92.4, mundo `cyberdeck-hud`, GM): módulo ativado em
-  `core.moduleConfiguration` (o Netrunner HUD continua ativo), `lang/en.json` carregado,
-  `cyberpunk-character-panel | ready` no console, nenhum erro.
+Arquivos: `src/domain/{subject,vital-state,panel-parts,plain-text,character,view-model}.ts`,
+`src/integrations/cpr/{character-adapter,subject-resolver}.ts`, `src/settings.ts`,
+`src/ui/character-panel-app.ts`, `src/main.ts`, `templates/{identity,vitals,dock}.hbs`,
+`styles/character-panel.css`, `lang/*.json`, testes em `tests/unit/` e `tests/fixtures/cpr-actor.ts`.
 
-## E0-02 — provas de API (feito)
+- E1-01: personagem exibido (D04) — atribuído primeiro; "seguir token selecionado" opcional;
+  mestre usa a seleção. Só atores próprios `character`/`mook`.
+- E1-02: ApplicationV2 sem moldura, inserido em `#ui-bottom` (acima da hotbar) ou `#ui-top`;
+  oculto sem personagem; recolher por botão e Alt+C (D15, D16); retrato abre a ficha.
+- E1-03: snapshot pelo adaptador → view model → partes `identity`, `vitals`, `dock`; hooks
+  marcam só as partes afetadas (debounce de 40 ms).
+- E1-04: ajustes de cliente: mostrar painel, seguir token, escala (0,7–1,4), posição
+  (embaixo/em cima); recolhido salvo no cliente.
 
-Resultados em docs/COMPATIBILITY.md. Resumo: rolagens por `sheet._onRoll` sintético funcionam
-para tudo que o painel precisa (GM e jogador dono); `render({parts})` preserva as outras partes;
-janela sem moldura funciona; `ColorField` vira `<color-picker>` nas configurações; ledger,
-favorito, death save e status `dead` testados; hooks `updateActor`/`updateItem`/`updateUser`
-conferidos. Achado: o sistema nunca calcula `dead` (HP 0 = `mortallyWounded`); biomonitor ajustado (D08).
-Não testado: `controlToken`, `canvasReady`, keybinding (só no `init`), diálogo nativo sem Ctrl
-nesta etapa, CSS no Electron do Foundry e no Firefox.
+Validação:
+- `npm run check` exit 0 (28 testes).
+- Manual real (Foundry 12.343, CPR v0.92.4, mundo `cyberdeck-hud`, sem erros no console):
+  GM sem seleção → oculto; selecionar mook/personagem troca; soltar → oculto. HP 15/0, status
+  `dead` e volta a 40: estado, cor e barra corretos, só a parte vital trocada (identidade e dock
+  são os mesmos nós); alias muda só a identidade; dados não exibidos não re-renderizam. Visual
+  conferido em captura. Recolher por clique real e por Alt+C real; recolhido persiste após F5.
+  Retrato abre a ficha. Posição em cima/embaixo, escala 1,2 e desligar/religar funcionam (uma
+  instância só). Jogador (Runner Teste) com personagem atribuído: painel aparece sem selecionar;
+  seguir token desligado ignora seleção; ligado mostra o mook e volta ao soltar; HP e nome do token
+  não vinculado alterados pelo mestre aparecem no cliente do jogador; tirar a atribuição oculta o
+  painel. pt-BR: rótulos do módulo e estado do sistema traduzidos ("Levemente Ferido").
+- Corrigidos durante o teste: barra de HP sumia no modo recolhido; alias com `<b>` ganhava espaço.
+- Não testado: Firefox e Electron do Foundry; tela estreita; ordem com outros módulos em `#ui-bottom`
+  (ex.: cpr-combat-hud).
 
-Dados deixados no mundo de teste para as próximas etapas (flag `cyberpunk-character-panel.probe`):
-atores "CCP Teste — Personagem" (character, role Medtech, Speedheal, ledgers 400 eb / 10 IP /
-Rep 1, LUCK 5/6, Perception favorita) e "CCP Teste — Mook" (Medtech), ambos do Runner Teste;
-cena "CCP Teste — Cena" com token vinculado do personagem e não vinculado do mook. Mensagens de
-chat das provas apagadas; ajuste temporário de cor removido do `localStorage`.
-Atenção: o último login no navegador do app foi "Runner Teste"; recarregar a aba do GM a
-reconecta como Runner (docs/TESTING.md do Netrunner HUD).
-
-## E0-03 — protótipo visual (feito, aguardando aprovação)
-
-`prototype/panel.html` (fora do build e do Prettier), publicado em
-<https://claude.ai/artifact/UZxzG4ErvFhCc2L6mycLeY> (privado). Tem cor de destaque com 8
-predefinições e color picker, contraste e aviso de conflito com cores de estado, biomonitor nos
-6 estados, HP com ±, modos completo/compacto/recolhido, gavetas (perícias com busca e favoritas,
-roles, NET, ficha rápida, saúde) e redução de movimento. Não conferido na tela por mim.
+Mundo de teste: Runner Teste agora tem "CCP Teste — Personagem" atribuído (de propósito, para as
+próximas etapas); cena "CCP Teste — Cena" com permissão de observador para todos; atores e cena
+de teste com a flag `cyberpunk-character-panel.probe`. Último login no navegador do app: Runner
+Teste (recarregar a aba do GM entra como Runner).
 
 ## Aguardando o usuário
 
-1. Aprovar ou pedir ajustes no protótipo (layout, cores, biomonitor).
-2. Fronteira com combate (D03a): armadura com ablação/reparo, rolar lesão crítica, mods situacionais.
-3. Confirmar D04 (personagem atribuído primeiro), nome/título (D11) e atalho de recolher (o
-   cpr-combat-hud usa `H`).
-4. Revisar as demais decisões **Propostas** em docs/DECISIONS.md.
+1. Fronteira com combate (D03a): armadura com ablação/reparo, rolar lesão crítica, mods situacionais.
+2. Confirmar D04, nome/título (D11), atalho Alt+C (D15) e o modo recolhido (D16).
+3. Revisar as demais decisões **Propostas** em docs/DECISIONS.md.
 
 ## Próximas tarefas
 
@@ -59,12 +60,13 @@ Estados: `TODO`, `BLOCKED`. Uma tarefa por vez; detalhe em docs/PLAN.md.
 
 | ID | Estado | Entrega | Condição |
 |---|---|---|---|
-| E1-01 | BLOCKED | Resolver o ator exibido | Confirmação de D04 |
-| E1-02 | BLOCKED | `CharacterPanelApp` persistente e recolhível | Aprovação do protótipo |
-| E1-03 | TODO | Snapshot e render incremental | Depois da E1-02 |
-| E1-04 | TODO | Ajustes de cliente básicos | Depois da E1-02 |
+| E2-01 | TODO | Identidade completa (já tem nome, alias, role/rank, retrato; falta anel de estado no retrato) | Pode começar |
+| E2-02 | TODO | HP: botões ±1/±5 e valor direto | Pode começar |
+| E2-03 | TODO | Biomonitor (D08) conforme o protótipo | Pode começar |
+| E2-04 | TODO | Humanity, LUCK ±, Death Save | Pode começar |
+| E2-05 | BLOCKED | Armadura | Decisão D03a |
 
 ## Pendências abertas
 
 - `npm audit`: 8 moderadas em dependências de dev.
-- Conferir CSS (`color-mix`, `oklch`) no Electron do Foundry e no Firefox.
+- Conferir CSS (`zoom`, `mask`, `color-mix`) no Electron do Foundry e no Firefox.

@@ -90,6 +90,19 @@ foi testado em execução no Netrunner HUD, não nesta etapa.
 | Hooks | Testado: `updateActor` chega com as chaves alteradas (ledger, HP, death save); `updateItem` ao favoritar; `updateUser` chega ao jogador com `character` nas chaves e `game.user.character` já atualizado. `controlToken` e `canvasReady` não testados |
 | Permissão | Testado: jogador dono grava HP/LUCK/ledger e rola; `update` em ator alheio lança "lacks permission" |
 
+## Fatos confirmados na E1 (testado em execução em 2026-11-16)
+
+- Ator sintético de token não vinculado: `actor.update` dispara `updateActor` com o ator
+  sintético (`isToken: true`, uuid `Scene.x.Token.y.Actor.z`); comparar por uuid. Nome do token
+  muda por `updateToken` (`name`).
+- `#ui-bottom` (`<footer>`) contém um `<div>` com `#hotbar`; inserir o painel como primeiro filho
+  o põe acima da hotbar. `#ui-top` serve para a posição "em cima".
+- `close()` de ApplicationV2 sem moldura anima (classe `minimizing`, ~0,5 s) antes de tirar o
+  elemento; `close({animate: false})` remove na hora.
+- `game.keybindings.register` no `init` com `{key: "KeyC", modifiers: ["Alt"]}` funciona (tecla real).
+- Ajustes de cliente com `name`/`hint` localizados aparecem na configuração em pt-BR.
+- `scene.view()` de cena criada por API só funciona para jogador com permissão na cena.
+
 ## Fatos de dados confirmados em execução (E0-02)
 
 - Ator criado por `CONFIG.Actor.documentClass.create` (character ou mook) recebe 63 perícias

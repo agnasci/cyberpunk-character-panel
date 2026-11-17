@@ -1,4 +1,22 @@
 {
   "CCP.Compat.WrongSystem": "O Character Panel exige o sistema Cyberpunk RED – CORE.",
-  "CCP.Compat.UntestedVersion": "O Character Panel foi testado com o Cyberpunk RED – CORE {tested}; este mundo usa {found}."
+  "CCP.Compat.UntestedVersion": "O Character Panel foi testado com o Cyberpunk RED – CORE {tested}; este mundo usa {found}.",
+  "CCP.Panel.OpenSheet": "Abrir ficha do personagem",
+  "CCP.Panel.Collapse": "Recolher painel",
+  "CCP.Panel.Expand": "Expandir painel",
+  "CCP.Vital.HP": "HP",
+  "CCP.Vital.Dead": "Morto",
+  "CCP.Vital.Unknown": "HP indisponível",
+  "CCP.Settings.enabled.Name": "Mostrar painel de personagem",
+  "CCP.Settings.enabled.Hint": "Mostra o painel sempre visível do seu personagem.",
+  "CCP.Settings.followControlled.Name": "Seguir token selecionado",
+  "CCP.Settings.followControlled.Hint": "Ao selecionar um token seu, mostra esse token no lugar do personagem atribuído.",
+  "CCP.Settings.scale.Name": "Escala do painel",
+  "CCP.Settings.scale.Hint": "Tamanho geral do painel de personagem.",
+  "CCP.Settings.dock.Name": "Posição do painel",
+  "CCP.Settings.dock.Hint": "Borda da tela onde o painel fica encaixado.",
+  "CCP.Settings.dock.Bottom": "Embaixo",
+  "CCP.Settings.dock.Top": "Em cima",
+  "CCP.Keybinding.Toggle.Name": "Recolher ou expandir o painel de personagem",
+  "CCP.Keybinding.Toggle.Hint": "Recolhe o painel numa barra fina ou o expande de novo."
 }
