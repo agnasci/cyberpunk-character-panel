@@ -5,9 +5,21 @@ system: your character's identity, vitals (with an animated biomonitor), stats, 
 role abilities and everyday sheet actions one click away, in a cyberpunk look you can
 recolor with a color picker. The native character sheet remains the source of truth.
 
-> **In development.** Nothing is released yet. Target: Foundry V12 (12.343) with the
-> Cyberpunk RED – CORE system v0.92.4. Combat (attacks, weapon damage, initiative) is
-> intentionally out of scope and will come from a separate module that plugs into this panel.
+> **Beta (0.1.0).** Tested with Foundry V12 (12.343) and the Cyberpunk RED – CORE system
+> v0.92.4. Combat (attacks, weapon damage, initiative) is intentionally out of scope and will
+> come from a separate module that plugs into this panel.
+
+## Installation
+
+In Foundry, go to **Add-on Modules → Install Module** and paste this manifest URL:
+
+```
+https://github.com/agnasci/cyberpunk-character-panel/releases/latest/download/module.json
+```
+
+Then enable **Character Panel — for Cyberpunk RED** in your world. Each player sees the panel
+for their assigned character; panel preferences (color, compact mode, position...) are saved
+per player.
 
 ## Development
 

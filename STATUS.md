@@ -6,9 +6,11 @@ Atualizado em: 2026-11-17.
 
 - E0 a E5 concluídas. Além do conteúdo da ficha (E1–E4), o painel tem cor de destaque por jogador
   com editor próprio, cor padrão do mundo definida pelo mestre e preferências de layout.
-- Todas as decisões de docs/DECISIONS.md estão confirmadas (D26–D28 novas nesta etapa).
-- Leiaute redesenhado em 2026-11-17 (D29–D31), aguardando validação do usuário; o protótipo E0-03
-  (`prototype/panel.html`) ficou como referência histórica.
+- Leiaute redesenhado em 2026-11-17 (D29–D43), validado pelo usuário em iterações no Foundry; o
+  protótipo E0-03 (`prototype/panel.html`) ficou como referência histórica.
+- **v0.1.0 (beta) publicada em 2026-11-17** no GitHub, repositório tornado público. Manifesto:
+  <https://github.com/agnasci/cyberpunk-character-panel/releases/latest/download/module.json>.
+  Sem página no site do Foundry ainda.
 - Repositório privado: <https://github.com/agnasci/cyberpunk-character-panel> (`main`); E4 em `2f31f4c`.
 
 ## Última entrega: UI-R1 — redesenho da interface (2026-11-17)

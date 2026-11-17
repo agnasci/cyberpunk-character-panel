@@ -45,7 +45,17 @@ Escopar tudo sob `.ccp-panel`. Seletores do núcleo (`.application ...`) e do CP
 
 ## Git e entrega
 
-Repositório local criado em 2026-11-16, ainda sem commit. Commits pequenos (`docs:`,
-`feat:`, `fix:`, `test:`), só quando o usuário pedir. Sem remoto nem publicação por
-inferência. Publicação seguirá o processo do Netrunner HUD (release no GitHub + API de
-release do Foundry com token fornecido na hora, nunca gravado).
+Repositório público `agnasci/cyberpunk-character-panel` (desde a v0.1.0, 2026-11-17), com
+autor e committer no e-mail noreply do GitHub (configurado só neste repositório). Commits
+pequenos (`docs:`, `feat:`, `fix:`, `test:`), só quando o usuário pedir; push e release só
+com pedido explícito.
+
+Release:
+
+1. Atualize `version` e `download` (`.../releases/download/vX.Y.Z/module.zip`) em `module.json`
+   e `version` em `package.json`; `npm run check`; commit e push no `main`.
+2. Compacte o conteúdo de `dist/` (`module.json` na raiz) como `module.zip` com
+   `tar.exe -a -cf` (o `Compress-Archive` do PowerShell 5.1 grava barras invertidas).
+3. `gh release create vX.Y.Z module.zip dist/module.json --title "vX.Y.Z (beta)"`, release normal
+   (o link `releases/latest` do manifesto ignora pre-releases).
+4. Página do Foundry (quando houver): mesmo fluxo do Netrunner HUD, com token pedido na hora.
