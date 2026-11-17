@@ -12,6 +12,16 @@ describe("vital limits", () => {
     expect(stepLuck(0, -1, 6)).toBe(0);
     expect(stepLuck(6, 1, 6)).toBe(6);
     expect(stepLuck(3, 1, 6)).toBe(4);
+    expect(stepLuck(8, -1, 6)).toBe(7);
+    expect(stepLuck(8, 1, 6)).toBe(8);
+    expect(stepHp(45, -1, 40)).toBe(44);
+    expect(stepHp(45, 5, 40)).toBe(45);
+    expect(stepHp(39, 5, 40)).toBe(40);
+    expect(parseHpEntry("-5", 45, 40)).toBe(40);
+    expect(parseHpEntry("43", 45, 40)).toBe(43);
+    expect(parseHpEntry("50", 45, 40)).toBe(45);
+    expect(parseHpEntry("50", 30, 40)).toBe(40);
+    expect(stepLuck(0, 1, 0)).toBe(0);
   });
 
   it("parses absolute and relative HP entries", () => {

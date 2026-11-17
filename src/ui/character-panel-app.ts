@@ -8,8 +8,9 @@ import {
   type DrawerId,
   filterVisible,
 } from "../domain/panel-views";
+import { alignOffset } from "../domain/placement";
 import { buildPanelView } from "../domain/view-model";
-import { parseHpEntry, stepHp, stepLuck } from "../domain/vital-limits";
+import { clampInt, parseHpEntry, stepHp, stepLuck } from "../domain/vital-limits";
 import {
   increaseDeathPenalty,
   resetDeathPenalty,
@@ -60,8 +61,8 @@ import {
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 const DIRTY_DELAY_MS = 40;
-const NARROW_WIDTH = 880;
-const TINY_WIDTH = 560;
+const NARROW_WIDTH = 760;
+const TINY_WIDTH = 520;
 
 function modifiersOf(event: Event): RollModifiers {
   const mouse = event as MouseEvent;
@@ -80,6 +81,7 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
       stepHp: CharacterPanelApp.#onStepHp,
       editHp: CharacterPanelApp.#onEditHp,
       adjustLuck: CharacterPanelApp.#onAdjustLuck,
+      setLuck: CharacterPanelApp.#onSetLuck,
       rollDeathSave: CharacterPanelApp.#onRollDeathSave,
       increaseDeathPenalty: CharacterPanelApp.#onIncreaseDeathPenalty,
       resetDeathPenalty: CharacterPanelApp.#onResetDeathPenalty,
@@ -125,9 +127,11 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
   #refocus: string | null = null;
   #drawer: DrawerId | null = null;
   #skillQuery = "";
+  #favScroll = 0;
   #preview: string | null = null;
   #resizer: ResizeObserver | null = null;
   #observed: HTMLElement | null = null;
+  #observedParent: HTMLElement | null = null;
   #flush = foundry.utils.debounce(() => void this.#renderPending(), DIRTY_DELAY_MS);
 
   constructor(settings: PanelSettings) {
@@ -165,6 +169,7 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
     if (changed) {
       this.#drawer = null;
       this.#skillQuery = "";
+      this.#favScroll = 0;
     }
     if (!this.#settings.enabled) return;
     if (!this.rendered) await this.render(true);
@@ -174,6 +179,7 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
   markDirty(parts: readonly PanelPart[]): void {
     if (parts.length === 0) return;
     for (const part of parts) this.#pending.add(part);
+    if (this.#drawer === "health" && this.#pending.has("vitals")) this.#pending.add("drawer");
     this.#flush();
   }
 
@@ -205,6 +211,7 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
     const base = await super._preparePartContext(partId, context, options);
     const actor = this.#resolved?.actor;
     if (!actor) return base;
+    if (partId === "dock") return { ...base, styleOpen: this.#drawer === "style" };
     if (partId === "actions") {
       const actions = buildActionsView(this.#drawer, {
         skills: readSkills(actor),
@@ -269,6 +276,7 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
     if (vitals?.state) this.element.dataset.vital = vitals.state;
     this.#applyRootState(context.hasSubject === true);
     this.#bindSkillSearch();
+    this.#bindFavorites();
     this.#bindStyleEditor();
     this.#observeWidth();
     if (this.#refocus) {
@@ -282,21 +290,42 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
 
   #observeWidth(): void {
     const root = this.element;
-    if (!root || this.#observed === root) return;
+    const parent = root?.parentElement ?? null;
+    if (!root || (this.#observed === root && this.#observedParent === parent)) return;
     this.#resizer ??= new ResizeObserver(() => this.#applyWidth());
-    if (this.#observed) this.#resizer.unobserve(this.#observed);
+    this.#resizer.disconnect();
     this.#resizer.observe(root);
+    if (parent) this.#resizer.observe(parent);
     this.#observed = root;
+    this.#observedParent = parent;
     this.#applyWidth();
   }
 
   #applyWidth(): void {
     const root = this.element;
-    if (!root || root.classList.contains("ccp-collapsed")) return;
+    if (!root) return;
+    this.#applyPlacement(root);
+    if (root.classList.contains("ccp-collapsed")) return;
     const width = root.getBoundingClientRect().width / (this.#settings.scale || 1);
     if (width === 0) return;
     root.classList.toggle("ccp-narrow", width < NARROW_WIDTH);
     root.classList.toggle("ccp-tiny", width < TINY_WIDTH);
+  }
+
+  #applyPlacement(root: HTMLElement): void {
+    const parent = root.parentElement;
+    if (!parent) return;
+    const area = parent.getBoundingClientRect();
+    const width = root.getBoundingClientRect().width;
+    if (width === 0) return;
+    const hotbar = document.getElementById("hotbar")?.getBoundingClientRect();
+    const shift = alignOffset({
+      areaLeft: area.left,
+      areaWidth: area.width,
+      panelWidth: width,
+      targetLeft: hotbar && hotbar.width > 0 ? hotbar.left : null,
+    });
+    root.style.setProperty("--ccp-shift", `${shift / (this.#settings.scale || 1)}px`);
   }
 
   #styleView() {
@@ -375,6 +404,35 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
         else hex.value = this.#preview ?? this.#settings.accent;
       });
     }
+  }
+
+  #bindFavorites(): void {
+    const strip = this.element.querySelector<HTMLElement>(".ccp-favs");
+    if (!strip || strip.dataset.bound === "1") return;
+    strip.dataset.bound = "1";
+    const update = () => {
+      const max = strip.scrollWidth - strip.clientWidth;
+      strip.classList.toggle("ccp-more-left", strip.scrollLeft > 1);
+      strip.classList.toggle("ccp-more-right", strip.scrollLeft < max - 1);
+    };
+    strip.scrollTo({ left: this.#favScroll, behavior: "instant" });
+    strip.addEventListener("scroll", () => {
+      this.#favScroll = strip.scrollLeft;
+      update();
+    });
+    strip.addEventListener(
+      "wheel",
+      (event) => {
+        if (strip.scrollWidth <= strip.clientWidth) return;
+        const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+        if (delta === 0) return;
+        event.preventDefault();
+        strip.scrollBy({ left: delta });
+      },
+      { passive: false },
+    );
+    new ResizeObserver(update).observe(strip);
+    update();
   }
 
   #bindSkillSearch(): void {
@@ -541,6 +599,20 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
       luck.value,
       (base) => stepLuck(base, delta, luck.max),
       (value) => setLuck(actor, value),
+    );
+  }
+
+  static async #onSetLuck(this: CharacterPanelApp, _event: Event, target: HTMLElement) {
+    const actor = this.#actor();
+    const luck = actor ? readCharacterSnapshot(actor, null).luck : null;
+    if (!actor || !luck) return;
+    const value = clampInt(Number(target.dataset.value), 0, luck.max);
+    this.#refocus = target.id;
+    await this.#queue(
+      `luck:${actor.uuid}`,
+      luck.value,
+      () => value,
+      (next) => setLuck(actor, next),
     );
   }
 

@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import type { CharacterSnapshot } from "../../src/domain/character";
-import { buildPanelView, hpPercent } from "../../src/domain/view-model";
+import {
+  buildPanelView,
+  deathSaveShown,
+  hpArc,
+  hpPercent,
+  luckPips,
+} from "../../src/domain/view-model";
 import { plainText } from "../../src/domain/plain-text";
 import { vitalState } from "../../src/domain/vital-state";
 
@@ -58,7 +64,7 @@ describe("buildPanelView", () => {
     expect(view.vitals).toMatchObject({
       state: "seriouslyWounded",
       stateLabelKey: "CPR.global.woundState.seriouslyWounded",
-      hp: { value: 12, max: 35, percent: 34 },
+      hp: { value: 12, max: 35, percent: 34, arc: 25.5 },
       monitor: { state: "seriouslyWounded", bpm: 128, flatline: false },
     });
   });
@@ -80,6 +86,19 @@ describe("buildPanelView", () => {
   it("shows humanity only for characters, like the native sheets", () => {
     expect(buildPanelView(snap()).vitals.humanity).toEqual({ value: 32, max: 40 });
     expect(buildPanelView(snap({ actorType: "mook" })).vitals.humanity).toBeNull();
+  });
+
+  it("keeps LUCK buttons sane for empty and overfilled pools", () => {
+    expect(buildPanelView(snap({ luck: { value: 0, max: 0 } })).vitals.luck).toMatchObject({
+      canSpend: false,
+      canRecover: false,
+      pips: null,
+    });
+    expect(buildPanelView(snap({ luck: { value: 8, max: 6 } })).vitals.luck).toMatchObject({
+      canSpend: true,
+      canRecover: false,
+      pips: null,
+    });
   });
 
   it("flags which LUCK buttons can act", () => {
@@ -115,5 +134,43 @@ describe("armor", () => {
     expect(
       buildPanelView(snap({ armor: { head: null, body: null, shield: null } })).vitals.armor,
     ).toBeNull();
+  });
+});
+
+describe("vital readouts", () => {
+  it("maps HP percent onto the 270-degree ring arc", () => {
+    expect(hpArc(100)).toBe(75);
+    expect(hpArc(34)).toBe(25.5);
+    expect(hpArc(0)).toBe(0);
+    expect(buildPanelView(snap({ hp: { value: 20, max: 40 } })).vitals.hp?.arc).toBe(37.5);
+  });
+
+  it("turns LUCK into pips and falls back to numbers for large pools", () => {
+    expect(luckPips({ value: 2, max: 4 })).toEqual([
+      { on: true, target: 1 },
+      { on: true, target: 2 },
+      { on: false, target: 3 },
+      { on: false, target: 4 },
+    ]);
+    expect(luckPips({ value: 0, max: 2 })?.map((p) => p.target)).toEqual([1, 2]);
+    expect(luckPips({ value: 1, max: 3 })?.map((p) => p.target)).toEqual([0, 2, 3]);
+    expect(luckPips({ value: 0, max: 0 })).toBeNull();
+    expect(luckPips({ value: 13, max: 13 })).toBeNull();
+    expect(luckPips({ value: 8, max: 6 })).toBeNull();
+    expect(luckPips({ value: 0, max: 1 })).toEqual([{ on: false, target: 1 }]);
+    expect(luckPips({ value: 1, max: 1 })).toEqual([{ on: true, target: 0 }]);
+    expect(luckPips({ value: 12, max: 12 })).toHaveLength(12);
+    expect(buildPanelView(snap()).vitals.luck?.pips).toHaveLength(6);
+  });
+
+  it("shows the Death Save chip only when it matters", () => {
+    const calm = { value: 0, penalty: 0, basePenalty: 0 };
+    expect(deathSaveShown("notWounded", calm)).toBe(false);
+    expect(deathSaveShown("lightlyWounded", calm)).toBe(false);
+    expect(deathSaveShown("seriouslyWounded", calm)).toBe(true);
+    expect(deathSaveShown("mortallyWounded", calm)).toBe(true);
+    expect(deathSaveShown("notWounded", { ...calm, penalty: 1 })).toBe(true);
+    expect(deathSaveShown("notWounded", { ...calm, basePenalty: 1 })).toBe(true);
+    expect(deathSaveShown("mortallyWounded", null)).toBe(false);
   });
 });

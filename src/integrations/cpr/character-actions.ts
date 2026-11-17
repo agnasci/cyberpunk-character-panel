@@ -1,4 +1,4 @@
-import { clampInt } from "../../domain/vital-limits";
+import { clampInt, poolCeiling } from "../../domain/vital-limits";
 import { readCharacterSnapshot } from "./character-adapter";
 
 interface CprSheet {
@@ -22,7 +22,7 @@ function editable(actor: Actor): boolean {
 export async function setHp(actor: Actor, value: number): Promise<boolean> {
   const hp = readCharacterSnapshot(actor, null).hp;
   if (!editable(actor) || !hp) return false;
-  const next = clampInt(value, 0, hp.max);
+  const next = clampInt(value, 0, poolCeiling(hp.value, hp.max));
   await actor.update({ "system.derivedStats.hp.value": next });
   return true;
 }
@@ -30,7 +30,7 @@ export async function setHp(actor: Actor, value: number): Promise<boolean> {
 export async function setLuck(actor: Actor, value: number): Promise<boolean> {
   const luck = readCharacterSnapshot(actor, null).luck;
   if (!editable(actor) || !luck) return false;
-  const next = clampInt(value, 0, luck.max);
+  const next = clampInt(value, 0, poolCeiling(luck.value, luck.max));
   await actor.update({ "system.stats.luck.value": next });
   return true;
 }

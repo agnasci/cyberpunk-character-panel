@@ -66,6 +66,8 @@ interface FoundryUser {
   readonly name: string;
   readonly isGM: boolean;
   readonly character: FoundryActor | null;
+  getFlag(scope: string, key: string): unknown;
+  setFlag(scope: string, key: string, value: unknown): Promise<unknown>;
 }
 
 interface FoundryActiveEffect {

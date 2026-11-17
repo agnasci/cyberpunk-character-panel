@@ -1,7 +1,7 @@
 # Design da interface
 
-Status: protótipo da E0-03 aprovado pelo usuário em 2026-11-16. Identidade, vital e biomonitor implementados na E1/E2;
-o restante é proposta até a etapa correspondente.
+Status: leiaute redesenhado em 2026-11-17 (D29–D31), aguardando validação do usuário. O protótipo
+da E0-03 (2026-11-16) fica como referência histórica do biomonitor.
 
 ## Princípios
 
@@ -14,29 +14,41 @@ o restante é proposta até a etapa correspondente.
 - Nada de rótulo truncado no nível principal: menos itens, maiores, com dica no hover.
 - Movimento tem propósito (ECG, foco, abrir gaveta) e desliga com redução de movimento.
 
-## Layout proposto (borda inferior, largura máx. ~1100 px, encaixe central)
+## Leiaute (D29, redesenho de 2026-11-17; borda inferior, `min(900px, 100%)`)
 
 ```
-        ┌───────────── gaveta (Perícias / Roles / NET / Ficha rápida / Saúde) ─────────────┐
-        └──────────────────────────────────────────────────────────────────────────────────┘
-╱‾‾‾‾‾‾‾‾╲┌──────────────────────┬─────────────────────────────┬──────────────────┬────────┐
-│ retrato ││ SEORIN KWON          │ ∿∿∿╱╲∿∿∿ biomonitor (ECG)   │ INT REF DEX TECH │ [slot] │
-│ chanfro ││ "alias"              │ HP ▰▰▰▰▰▰▰▰▱▱ 35/35  − +    │ COOL WILL MOVE … │ módulo │
-╲________╱│ NETRUNNER ▸ 4        │ HUM 32/42 · LUCK 4/4 · DS 0 │                  │ combate│
-          │ ● SEM FERIMENTOS     │ SP 11 · 10  (confirmar)     │                  │        │
-          └──────────────────────┴─────────────────────────────┴──────────────────┴────────┘
-          [Perícias] [Roles] [NET] [Facedown] [Ficha rápida] [Saúde]  ★ favoritas: …  ⚙
+                ★ Perception 14  Stealth 8        [☰][▣][⌁][€][✚][🎲]  [🎨][⌄]   ← faixa de abas
+┌──────────┬──────────────────────────────────────────────┬────────────────────┐
+│  ╭────╮  │ SEORIN KWON  “alias”            [NETRUNNER 4] │ INT REF DEX TEC COOL│
+│ ( ⬡  ) │ ∿∿∿╱╲∿∿∿∿∿∿╱╲∿∿∿∿∿∿∿∿╱╲∿∿∿∿∿∿∿  ◆ NÃO FERIDO│  8   6   6   6   6  │
+│  ╰35/35╯ │ ⛨ HEAD 11 BODY 9 │ HUM 32/42 ▔ │ LUCK ◆◆◆◇ │ ☠ │ WILL MOVE BODY LUCK │
+└──────────┴──────────────────────────────────────────────┴────────────────────┘
 ```
 
-- Retrato com chanfro (`clip-path`), moldura na cor de destaque, anel de estado de
-  ferimento. Clique abre a ficha.
-- Bloco vital é o centro visual: biomonitor em cima, barra de HP segmentada abaixo,
-  chips de Humanity/LUCK/Death Save; botões ± aparecem no hover/foco para limpar a tela.
-- STATs em grade 5×2 de "teclas" com rótulo pequeno em cima e número grande.
-- Linha de atalhos abaixo; favoritas como chips roláveis; engrenagem abre personalização.
-- Região `slot` à direita fica vazia sem o módulo de combate (não ocupa espaço).
-- Modo compacto: só retrato, ECG, HP e atalhos. Recolhido: aba fina com nome + ECG.
-- Container queries para larguras estreitas (empilhar STATs, esconder rótulos longos).
+- Grade única no `.ccp-panel`; as partes `identity` e `vitals` usam `display: contents` e
+  seus filhos ocupam áreas próprias (`portrait`, `name`, `monitor`, `chips`). O fundo do
+  corpo é o `::before` da grade (área de `name` até `chips`), então a faixa de abas e a gaveta
+  ficam fora do corpo, como abas de pasta. As áreas vêm de variáveis (`--ccp-head`,
+  `--ccp-body`), e o encaixe em cima só inverte a ordem.
+- Retrato octogonal dentro do anel de HP: SVG com `pathLength=100`, arco de 270° (`hp.arc` do
+  domínio), segmentado por máscara, na cor do estado vital; brilho radial do estado atrás do
+  retrato. O valor de HP fica no vão inferior do anel (clique edita); −5/−1 e +1/+5 aparecem
+  nas laterais ao passar o mouse no retrato ou com foco (sempre visíveis sem hover).
+- ECG estreito (130–170 px × 40 px) sem moldura, com grade que se apaga nas bordas e BPM com
+  coração pulsando no canto; fica ao lado dos chips (D34) e nasce sob a borda do anel, com grade em
+  elipse e linha base na cor do estado (D35). O estado de ferimento é o primeiro chip.
+- Painel de instrumentos (D41): células SP, HUM (com barra), LUCK (losangos clicáveis, menores de 9 a 12;
+  número com −/+ acima de 12 ou acima do máximo, D42) e Death Save só quando importa (D30), como célula-botão de rolar; a penalidade
+  se ajusta na gaveta Saúde. O estado de ferimento é a legenda do ECG.
+- STATs: teclado 5×2 com barra de nível (valor/10) na base de cada tecla.
+- Abas: só ícone (dica no hover); a aberta fica com o ícone destacado na cor de destaque (D43). Facedown é aba de ação
+  (hachurada). Favoritas ocupam o resto da faixa à esquerda; com muitas, a roda do mouse rola na
+  horizontal e as bordas esmaecem do lado em que há mais (D36).
+- Gaveta acima da faixa (abaixo no encaixe em cima), com animação curta de abertura.
+- `ccp-narrow` (< 760 px): STATs viram uma linha de 10 abaixo do corpo. `ccp-tiny` (< 520 px):
+  chips em linha própria, anel menor, sem alias. Compacto: retrato/anel, nome e chips, sem ECG (D34).
+- Recolhido (D37): retrato circular no anel de HP, nome pequeno sobre o mini ECG e expandir.
+- Borda esquerda alinhada à hotbar (D33), dentro dos limites da coluna central do Foundry.
 
 ## Linguagem visual
 

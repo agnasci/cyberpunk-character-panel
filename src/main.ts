@@ -7,7 +7,12 @@ import {
   partsForTokenChange,
 } from "./domain/panel-parts";
 import { resolveSubject } from "./integrations/cpr/subject-resolver";
-import { readSettings, registerSettings } from "./settings";
+import {
+  hasPendingPrefWrites,
+  readSettings,
+  registerSettings,
+  restorePlayerPrefs,
+} from "./settings";
 import { CharacterPanelApp } from "./ui/character-panel-app";
 
 const SUBJECT_DELAY_MS = 50;
@@ -38,7 +43,7 @@ Hooks.once("init", () => {
   );
 });
 
-Hooks.once("ready", () => {
+Hooks.once("ready", async () => {
   const result = checkSystemCompatibility(game.system);
   if (result.status === "wrong-system") {
     console.warn(`${MODULE_ID} | ${game.i18n.localize("CCP.Compat.WrongSystem")}`);
@@ -52,6 +57,7 @@ Hooks.once("ready", () => {
       })}`,
     );
   }
+  await restorePlayerPrefs();
   app = new CharacterPanelApp(readSettings());
   refreshSubject();
 
@@ -61,7 +67,12 @@ Hooks.once("ready", () => {
   Hooks.on("deleteToken", () => refreshSubject());
   Hooks.on("deleteActor", () => refreshSubject());
   Hooks.on("updateUser", (user, changes) => {
-    if (user.id === game.user.id && "character" in changes) refreshSubject();
+    if (user.id !== game.user.id) return;
+    if ("character" in changes) refreshSubject();
+    const prefsChanged = changedKeys(changes).some((k) => k.startsWith(`flags.${MODULE_ID}.`));
+    if (prefsChanged && !hasPendingPrefWrites()) {
+      void restorePlayerPrefs();
+    }
   });
   Hooks.on("updateActor", (actor, changes) => {
     if ("ownership" in changes) refreshSubject();

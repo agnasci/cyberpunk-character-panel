@@ -85,7 +85,9 @@ foi testado em execução no Netrunner HUD, não nesta etapa.
 | Render por partes | Testado: `render({parts: ["b"]})` troca só o nó da parte `b`; o nó da parte `a` continua o mesmo objeto (marca em `dataset` preservada), então animação CSS dele não reinicia |
 | Ajuste com cor | Testado: `register(..., {type: new foundry.data.fields.ColorField({required: true, blank: false})})` aparece na tela de configurações como `<color-picker>` (texto + `<input type="color">`); salvar grava no `localStorage` |
 | `color-mix()`, `oklch()`, container queries | `CSS.supports` verdadeiro no navegador do teste (Chrome 156, painel do app). Não testado no Electron do Foundry nem no Firefox |
-| Ajuste de cliente em `localStorage` | Testado (acima) |
+| Ajuste de cliente em `localStorage` | Testado (acima). V12 só tem os escopos `client` e `world` (`client/core/settings.js`) |
+| HP e LUCK acima do máximo | Testado (2026-11-17, CPR v0.92.4): `actor.update` com `hp.value` 45 e máx. 40 grava 40 (o sistema limita o HP); LUCK 8 com máx. 6 é gravada como 8 |
+| Flag no próprio `User` pelo jogador | Testado (2026-11-17): `game.user.setFlag/getFlag/unsetFlag` funcionam para jogador sem ser mestre; base das preferências por jogador (D40) |
 | `game.keybindings.register` | Existe; registro só vale no `init` (testar na E1-02) |
 | Hooks | Testado: `updateActor` chega com as chaves alteradas (ledger, HP, death save); `updateItem` ao favoritar; `updateUser` chega ao jogador com `character` nas chaves e `game.user.character` já atualizado. `controlToken` e `canvasReady` não testados |
 | Permissão | Testado: jogador dono grava HP/LUCK/ledger e rola; `update` em ator alheio lança "lacks permission" |

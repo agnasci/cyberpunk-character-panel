@@ -1,5 +1,55 @@
-import { KEYBINDING_TOGGLE, MODULE_ID, SETTINGS } from "./constants";
+import { KEYBINDING_TOGGLE, MODULE_ID, PLAYER_PREF_KEYS, PREFS_FLAG, SETTINGS } from "./constants";
 import { DEFAULT_ACCENT, normalizeHex } from "./domain/palette";
+import { type PrefValues, prefsToApply, prefsToSeed } from "./domain/player-prefs";
+
+let restoring = false;
+let pendingWrites = 0;
+
+async function writeFlag(key: string, value: unknown): Promise<void> {
+  pendingWrites++;
+  try {
+    await game.user.setFlag(MODULE_ID, key, value);
+  } finally {
+    pendingWrites--;
+  }
+}
+
+export function hasPendingPrefWrites(): boolean {
+  return pendingWrites > 0;
+}
+
+function storedPrefs(): PrefValues | null {
+  const raw = game.user.getFlag(MODULE_ID, PREFS_FLAG);
+  return raw && typeof raw === "object" ? (raw as PrefValues) : null;
+}
+
+function currentPrefs(): PrefValues {
+  const values: PrefValues = {};
+  for (const key of PLAYER_PREF_KEYS) values[key] = game.settings.get(MODULE_ID, key);
+  return values;
+}
+
+function storePlayerPref(key: string, value: unknown): void {
+  if (restoring) return;
+  void writeFlag(`${PREFS_FLAG}.${key}`, value ?? null);
+}
+
+export async function restorePlayerPrefs(): Promise<void> {
+  const stored = storedPrefs();
+  const apply = prefsToApply(stored, currentPrefs(), PLAYER_PREF_KEYS);
+  restoring = true;
+  try {
+    for (const [key, value] of Object.entries(apply)) {
+      await game.settings.set(MODULE_ID, key, value);
+    }
+  } finally {
+    restoring = false;
+  }
+  const seed = prefsToSeed(stored, currentPrefs(), PLAYER_PREF_KEYS);
+  if (Object.keys(seed).length > 0) {
+    await writeFlag(PREFS_FLAG, { ...(stored ?? {}), ...seed });
+  }
+}
 
 export type DockPosition = "bottom" | "top";
 
@@ -25,7 +75,10 @@ export function registerSettings(onChange: () => void, onToggle: () => void): vo
       hint: `CCP.Settings.${key}.Hint`,
       scope: "client",
       config: true,
-      onChange,
+      onChange: (value: unknown) => {
+        storePlayerPref(key, value);
+        onChange();
+      },
       ...data,
     });
   client(SETTINGS.enabled, { type: Boolean, default: true });
@@ -66,6 +119,7 @@ export function registerSettings(onChange: () => void, onToggle: () => void): vo
     config: false,
     type: Boolean,
     default: false,
+    onChange: (value: unknown) => storePlayerPref(SETTINGS.collapsed, value),
   });
   game.keybindings.register(MODULE_ID, KEYBINDING_TOGGLE, {
     name: "CCP.Keybinding.Toggle.Name",

@@ -12,6 +12,18 @@ export interface IdentityView {
 
 export interface PoolView extends Pool {
   percent: number;
+  arc: number;
+}
+
+export interface LuckPip {
+  on: boolean;
+  target: number;
+}
+
+export interface LuckView extends Pool {
+  canSpend: boolean;
+  canRecover: boolean;
+  pips: LuckPip[] | null;
 }
 
 export interface VitalsView {
@@ -20,8 +32,9 @@ export interface VitalsView {
   monitor: MonitorView;
   hp: PoolView | null;
   humanity: Pool | null;
-  luck: (Pool & { canSpend: boolean; canRecover: boolean }) | null;
+  luck: LuckView | null;
   deathSave: DeathSaveSnapshot | null;
+  deathSaveShown: boolean;
   armor: ArmorSnapshot | null;
 }
 
@@ -40,9 +53,36 @@ const STATE_LABELS: Record<VitalState, string> = {
   unknown: "CCP.Vital.Unknown",
 };
 
+export const HP_ARC = 75;
+export const MAX_LUCK_PIPS = 12;
+
+const DEATH_SAVE_STATES: ReadonlySet<VitalState> = new Set(["seriouslyWounded", "mortallyWounded"]);
+
 export function hpPercent(value: number, max: number): number {
   if (max <= 0) return 0;
   return Math.round((Math.min(Math.max(value, 0), max) / max) * 100);
+}
+
+export function hpArc(percent: number): number {
+  return Math.round(percent * HP_ARC) / 100;
+}
+
+export function luckPips(luck: Pool): LuckPip[] | null {
+  if (luck.max <= 0 || luck.max > MAX_LUCK_PIPS || luck.value > luck.max) return null;
+  return Array.from({ length: luck.max }, (_, i) => ({
+    on: i < luck.value,
+    target: i === 0 && luck.value === 1 ? 0 : i + 1,
+  }));
+}
+
+export function deathSaveShown(state: VitalState, deathSave: DeathSaveSnapshot | null): boolean {
+  if (!deathSave) return false;
+  return DEATH_SAVE_STATES.has(state) || deathSave.penalty > 0 || deathSave.basePenalty > 0;
+}
+
+function hpView(hp: Pool): PoolView {
+  const percent = hpPercent(hp.value, hp.max);
+  return { ...hp, percent, arc: hpArc(percent) };
 }
 
 function hasArmor(armor: ArmorSnapshot): boolean {
@@ -63,12 +103,18 @@ export function buildPanelView(snapshot: CharacterSnapshot): PanelView {
       state,
       stateLabelKey: STATE_LABELS[state],
       monitor: buildMonitor(state),
-      hp: snapshot.hp
-        ? { ...snapshot.hp, percent: hpPercent(snapshot.hp.value, snapshot.hp.max) }
-        : null,
+      hp: snapshot.hp ? hpView(snapshot.hp) : null,
       humanity: snapshot.actorType === "character" ? snapshot.humanity : null,
-      luck: luck ? { ...luck, canSpend: luck.value > 0, canRecover: luck.value < luck.max } : null,
+      luck: luck
+        ? {
+            ...luck,
+            canSpend: luck.value > 0,
+            canRecover: luck.value < luck.max,
+            pips: luckPips(luck),
+          }
+        : null,
       deathSave: snapshot.deathSave,
+      deathSaveShown: deathSaveShown(state, snapshot.deathSave),
       armor: hasArmor(snapshot.armor) ? snapshot.armor : null,
     },
     canEdit: snapshot.canEdit,

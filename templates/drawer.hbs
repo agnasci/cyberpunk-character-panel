@@ -1,10 +1,14 @@
-<section class="ccp-drawer" id="ccp-drawer" {{#unless drawer.open}}hidden{{/unless}}>
+<section class="ccp-drawer" id="ccp-drawer" data-drawer="{{drawer.open}}" {{#unless drawer.open}}hidden{{/unless}}>
   {{#if drawer.skills}}
   <header>
-    <h2>{{localize "CCP.Drawer.Skills"}}</h2>
-    <input type="search" id="ccp-skill-search" class="ccp-search" placeholder="{{localize 'CCP.Skills.Search'}}" aria-label="{{localize 'CCP.Skills.Search'}}" autocomplete="off">
+    <h2><i class="fa-solid fa-list-check" aria-hidden="true"></i>{{localize "CCP.Drawer.Skills"}}</h2>
+    <label class="ccp-search-wrap">
+      <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      <input type="search" id="ccp-skill-search" class="ccp-search" placeholder="{{localize 'CCP.Skills.Search'}}" aria-label="{{localize 'CCP.Skills.Search'}}" autocomplete="off">
+    </label>
   </header>
   <div class="ccp-skill-cols">
+    <div class="ccp-skill-flow">
     {{#each drawer.skills}}
     <div class="ccp-skill-group" data-category="{{category}}">
       <h3>{{localize labelKey}}</h3>
@@ -13,25 +17,26 @@
         <button type="button" id="ccp-fav-toggle-{{id}}" class="ccp-star" data-action="toggleFavorite" data-skill-id="{{id}}" aria-pressed="{{#if favorite}}true{{else}}false{{/if}}" aria-label="{{localize 'CCP.Skills.Favorite'}}: {{label}}" data-tooltip="{{localize 'CCP.Skills.Favorite'}}" {{#unless @root.canEdit}}disabled{{/unless}}><i class="fa-{{#if favorite}}solid{{else}}regular{{/if}} fa-star" aria-hidden="true"></i></button>
         <button type="button" id="ccp-skill-{{id}}" class="ccp-skill-roll" data-action="rollSkill" data-skill-id="{{id}}" {{#unless @root.canEdit}}disabled{{/unless}}>
           <span class="ccp-skill-name">{{label}}</span>
-          <span class="ccp-skill-calc{{#if situational}} ccp-situational{{/if}}">{{localize statLabelKey}} + {{level}}{{#if mod}} {{#if (gt mod 0)}}+{{/if}}{{mod}}{{/if}}</span>
+          <span class="ccp-skill-calc{{#if situational}} ccp-situational{{/if}}">{{localize statLabelKey}}+{{level}}{{#if mod}}{{#if (gt mod 0)}}+{{/if}}{{mod}}{{/if}}</span>
           <b class="ccp-skill-total">{{total}}</b>
         </button>
       </div>
       {{/each}}
     </div>
     {{/each}}
+    </div>
   </div>
   <p class="ccp-empty" hidden>{{localize "CCP.Skills.NoMatch"}}</p>
   {{/if}}
   {{#if drawer.roles}}
-  <header><h2>{{localize "CCP.Drawer.Roles"}}</h2></header>
+  <header><h2><i class="fa-solid fa-id-badge" aria-hidden="true"></i>{{localize "CCP.Drawer.Roles"}}</h2></header>
   <div class="ccp-role-list">
     {{#each drawer.roles}}
     <div class="ccp-role-block{{#if active}} ccp-active{{/if}}">
-      <h3>{{label}} <b>{{rank}}</b></h3>
+      <h3><span>{{label}}</span><b>{{rank}}</b></h3>
       <div class="ccp-btn-grid">
         {{#each abilities}}
-        <button type="button" id="ccp-role-{{../id}}-{{@index}}" class="ccp-key ccp-chamfer" data-action="rollRole" data-role-id="{{../id}}" data-subtype="{{subtype}}" data-ability="{{name}}" {{#unless @root.canEdit}}disabled{{/unless}}>{{label}} <b>{{rank}}</b></button>
+        <button type="button" id="ccp-role-{{../id}}-{{@index}}" class="ccp-cell" data-action="rollRole" data-role-id="{{../id}}" data-subtype="{{subtype}}" data-ability="{{name}}" {{#unless @root.canEdit}}disabled{{/unless}}><span>{{label}}</span><b>{{rank}}</b></button>
         {{/each}}
       </div>
     </div>
@@ -40,36 +45,36 @@
   {{/if}}
   {{#if drawer.net}}
   <header>
-    <h2>{{localize "CCP.Drawer.Net"}}</h2>
-    <span class="ccp-note">{{drawer.net.deckName}}{{#if drawer.net.netRoleLabel}} · {{drawer.net.netRoleLabel}}{{else}} · {{localize "CCP.Net.NoRole"}}{{/if}}</span>
+    <h2><i class="fa-solid fa-network-wired" aria-hidden="true"></i>{{localize "CCP.Drawer.Net"}}</h2>
+    <span class="ccp-note"><i class="fa-solid fa-microchip" aria-hidden="true"></i> {{drawer.net.deckName}}{{#if drawer.net.netRoleLabel}} · {{drawer.net.netRoleLabel}}{{else}} · {{localize "CCP.Net.NoRole"}}{{/if}}</span>
   </header>
-  <div class="ccp-btn-grid">
+  <div class="ccp-btn-grid ccp-net-grid">
     {{#each drawer.net.abilities}}
-    <button type="button" id="ccp-net-{{key}}" class="ccp-key ccp-chamfer" data-action="rollInterface" data-ability="{{key}}" data-deck-id="{{@root.drawer.net.deckId}}" {{#unless @root.canEdit}}disabled{{/unless}}>{{localize labelKey}}</button>
+    <button type="button" id="ccp-net-{{key}}" class="ccp-cell" data-action="rollInterface" data-ability="{{key}}" data-deck-id="{{@root.drawer.net.deckId}}" {{#unless @root.canEdit}}disabled{{/unless}}><span>{{localize labelKey}}</span><i class="fa-solid fa-dice-d10" aria-hidden="true"></i></button>
     {{/each}}
   </div>
   {{/if}}
   {{#if drawer.ledgers}}
   <header>
-    <h2>{{localize "CCP.Drawer.Sheet"}}</h2>
+    <h2><i class="fa-solid fa-wallet" aria-hidden="true"></i>{{localize "CCP.Drawer.Sheet"}}</h2>
     <span class="ccp-note">{{localize "CCP.Ledger.Note"}}</span>
   </header>
   <div class="ccp-ledgers">
     {{#each drawer.ledgers}}
-    <div class="ccp-ledger ccp-chamfer" data-prop="{{prop}}">
+    <div class="ccp-ledger" data-prop="{{prop}}">
       <div class="ccp-ledger-head">
         <span class="ccp-ledger-label">{{localize labelKey}}</span>
-        <button type="button" id="ccp-led-open-{{prop}}" class="ccp-mini-btn" data-action="openLedger" data-prop="{{prop}}" aria-label="{{localize 'CPR.ledger.ledgerOpen'}}" data-tooltip="{{localize 'CPR.ledger.ledgerOpen'}}"><i class="fa-solid fa-note-sticky" aria-hidden="true"></i></button>
+        <b class="ccp-ledger-value">{{value}}{{#if unit}}<small>{{unit}}</small>{{/if}}</b>
+        <button type="button" id="ccp-led-open-{{prop}}" class="ccp-mini-btn" data-action="openLedger" data-prop="{{prop}}" aria-label="{{localize 'CPR.ledger.ledgerOpen'}}" data-tooltip="{{localize 'CPR.ledger.ledgerOpen'}}"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i></button>
       </div>
-      <b class="ccp-ledger-value">{{value}}{{#if unit}} <small>{{unit}}</small>{{/if}}</b>
       {{#if @root.canEdit}}
       <div class="ccp-ledger-form">
         <input type="text" inputmode="numeric" id="ccp-led-amount-{{prop}}" class="ccp-ledger-amount" placeholder="{{localize 'CCP.Ledger.Amount'}}" aria-label="{{localize 'CCP.Ledger.Amount'}}: {{localize labelKey}}" autocomplete="off">
         <input type="text" id="ccp-led-reason-{{prop}}" class="ccp-ledger-reason" placeholder="{{localize 'CCP.Ledger.Reason'}}" aria-label="{{localize 'CCP.Ledger.Reason'}}: {{localize labelKey}}" autocomplete="off">
-        <div class="ccp-ledger-btns">
-          <button type="button" id="ccp-led-add-{{prop}}" class="ccp-step ccp-chamfer" data-action="changeLedger" data-prop="{{prop}}" data-mode="add" aria-label="{{localize 'CCP.Ledger.Add'}}" data-tooltip="{{localize 'CCP.Ledger.Add'}}"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
-          <button type="button" id="ccp-led-sub-{{prop}}" class="ccp-step ccp-chamfer" data-action="changeLedger" data-prop="{{prop}}" data-mode="subtract" aria-label="{{localize 'CCP.Ledger.Subtract'}}" data-tooltip="{{localize 'CCP.Ledger.Subtract'}}"><i class="fa-solid fa-minus" aria-hidden="true"></i></button>
-          <button type="button" id="ccp-led-set-{{prop}}" class="ccp-step ccp-chamfer" data-action="changeLedger" data-prop="{{prop}}" data-mode="set" aria-label="{{localize 'CCP.Ledger.Set'}}" data-tooltip="{{localize 'CCP.Ledger.Set'}}"><i class="fa-solid fa-equals" aria-hidden="true"></i></button>
+        <div class="ccp-seg" role="group">
+          <button type="button" id="ccp-led-add-{{prop}}" class="ccp-step" data-action="changeLedger" data-prop="{{prop}}" data-mode="add" aria-label="{{localize 'CCP.Ledger.Add'}}" data-tooltip="{{localize 'CCP.Ledger.Add'}}"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
+          <button type="button" id="ccp-led-sub-{{prop}}" class="ccp-step" data-action="changeLedger" data-prop="{{prop}}" data-mode="subtract" aria-label="{{localize 'CCP.Ledger.Subtract'}}" data-tooltip="{{localize 'CCP.Ledger.Subtract'}}"><i class="fa-solid fa-minus" aria-hidden="true"></i></button>
+          <button type="button" id="ccp-led-set-{{prop}}" class="ccp-step" data-action="changeLedger" data-prop="{{prop}}" data-mode="set" aria-label="{{localize 'CCP.Ledger.Set'}}" data-tooltip="{{localize 'CCP.Ledger.Set'}}"><i class="fa-solid fa-equals" aria-hidden="true"></i></button>
         </div>
       </div>
       {{/if}}
@@ -78,39 +83,53 @@
   </div>
   {{/if}}
   {{#if drawer.health}}
-  <header><h2>{{localize "CCP.Drawer.Health"}}</h2></header>
+  <header>
+    <h2><i class="fa-solid fa-kit-medical" aria-hidden="true"></i>{{localize "CCP.Drawer.Health"}}</h2>
+    {{#if @root.vitals.deathSave}}
+    <div class="ccp-ds-panel{{#if @root.vitals.deathSaveShown}} ccp-alert{{/if}}" role="group" aria-label="{{localize 'CCP.Vital.DeathSave'}}">
+      {{#if @root.canEdit}}
+      <button type="button" id="ccp-hds-roll" class="ccp-step" data-action="rollDeathSave" data-tooltip="{{localize 'CPR.characterSheet.leftPane.deathSave.roll'}}"><i class="fa-solid fa-skull" aria-hidden="true"></i> {{localize "CCP.Vital.DeathSave"}}</button>
+      {{else}}<span><i class="fa-solid fa-skull" aria-hidden="true"></i> {{localize "CCP.Vital.DeathSave"}}</span>{{/if}}
+      <b data-tooltip="{{localize 'CPR.global.generic.deathPenalty'}}: {{@root.vitals.deathSave.penalty}}<br>{{localize 'CPR.characterSheet.leftPane.deathSave.hoverCriticalInjuryPenalty'}}: {{@root.vitals.deathSave.basePenalty}}">{{@root.vitals.deathSave.value}}</b>
+      {{#if @root.canEdit}}
+      <button type="button" id="ccp-hds-up" class="ccp-mini-btn" data-action="increaseDeathPenalty" aria-label="{{localize 'CPR.characterSheet.leftPane.deathSave.increase'}}" data-tooltip="{{localize 'CPR.characterSheet.leftPane.deathSave.increase'}}"><i class="fa-solid fa-angle-up" aria-hidden="true"></i></button>
+      <button type="button" id="ccp-hds-reset" class="ccp-mini-btn" data-action="resetDeathPenalty" aria-label="{{localize 'CPR.characterSheet.leftPane.deathSave.reset'}}" data-tooltip="{{localize 'CPR.characterSheet.leftPane.deathSave.reset'}}" {{#unless @root.vitals.deathSave.penalty}}disabled{{/unless}}><i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i></button>
+      {{/if}}
+    </div>
+    {{/if}}
+  </header>
   <div class="ccp-health">
     <div class="ccp-health-col">
-      <h3>{{localize "CCP.Health.Injuries"}}</h3>
+      <h3><i class="fa-solid fa-bone" aria-hidden="true"></i>{{localize "CCP.Health.Injuries"}}</h3>
       {{#each drawer.health.injuries}}
-      <button type="button" id="ccp-inj-{{id}}" class="ccp-row" data-action="openItem" data-item-type="criticalInjury" data-item-id="{{id}}">
+      <button type="button" id="ccp-inj-{{id}}" class="ccp-row ccp-row-injury" data-action="openItem" data-item-type="criticalInjury" data-item-id="{{id}}">
         <span>{{name}}</span>
         <small>{{localize locationKey}}{{#if deathSaveIncrease}} · <i class="fa-solid fa-skull" aria-hidden="true"></i> {{localize "CCP.Health.DeathSavePlus"}}{{/if}}</small>
       </button>
       {{else}}
       <p class="ccp-empty">{{localize "CCP.Health.NoInjuries"}}</p>
       {{/each}}
-      <h3>{{localize "CCP.Health.Drugs"}}</h3>
+      <h3><i class="fa-solid fa-pills" aria-hidden="true"></i>{{localize "CCP.Health.Drugs"}}</h3>
       {{#each drawer.health.drugs}}
       <div class="ccp-row ccp-row-static">
         <button type="button" id="ccp-drug-open-{{id}}" class="ccp-row-link" data-action="openItem" data-item-type="drug" data-item-id="{{id}}">{{name}} <small>×{{amount}}</small></button>
-        {{#if @root.canEdit}}<button type="button" id="ccp-drug-use-{{id}}" class="ccp-step ccp-chamfer" data-action="useDrug" data-item-id="{{id}}" {{#unless usable}}disabled{{/unless}}><i class="fa-solid fa-pills" aria-hidden="true"></i> {{localize "CPR.global.generic.snort"}}</button>{{/if}}
+        {{#if @root.canEdit}}<button type="button" id="ccp-drug-use-{{id}}" class="ccp-step" data-action="useDrug" data-item-id="{{id}}" {{#unless usable}}disabled{{/unless}}><i class="fa-solid fa-syringe" aria-hidden="true"></i> {{localize "CPR.global.generic.snort"}}</button>{{/if}}
       </div>
       {{else}}
       <p class="ccp-empty">{{localize "CCP.Health.NoDrugs"}}</p>
       {{/each}}
     </div>
     <div class="ccp-health-col">
-      <h3>{{localize "CCP.Health.Effects"}}</h3>
+      <h3><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>{{localize "CCP.Health.Effects"}}</h3>
       {{#each drawer.health.effects}}
       <div class="ccp-row ccp-row-static{{#if disabled}} ccp-off{{/if}}">
         <button type="button" id="ccp-eff-open-{{@index}}" class="ccp-row-link" data-action="openEffect" data-effect-uuid="{{uuid}}">{{#if img}}<img src="{{img}}" alt="">{{/if}}{{name}}{{#if source}} <small>{{source}}</small>{{/if}}</button>
-        {{#if @root.canEdit}}<button type="button" id="ccp-eff-toggle-{{@index}}" class="ccp-mini-btn" data-action="toggleEffect" data-effect-uuid="{{uuid}}" aria-pressed="{{#if disabled}}false{{else}}true{{/if}}" aria-label="{{localize 'CCP.Health.ToggleEffect'}}: {{name}}" data-tooltip="{{localize 'CCP.Health.ToggleEffect'}}"><i class="fa-solid {{#if disabled}}fa-toggle-off{{else}}fa-toggle-on{{/if}}" aria-hidden="true"></i></button>{{/if}}
+        {{#if @root.canEdit}}<button type="button" id="ccp-eff-toggle-{{@index}}" class="ccp-switch" data-action="toggleEffect" data-effect-uuid="{{uuid}}" role="switch" aria-checked="{{#if disabled}}false{{else}}true{{/if}}" aria-label="{{localize 'CCP.Health.ToggleEffect'}}: {{name}}" data-tooltip="{{localize 'CCP.Health.ToggleEffect'}}"></button>{{/if}}
       </div>
       {{else}}
       <p class="ccp-empty">{{localize "CCP.Health.NoEffects"}}</p>
       {{/each}}
-      <h3>{{localize "CCP.Health.Statuses"}}</h3>
+      <h3><i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i>{{localize "CCP.Health.Statuses"}}</h3>
       <div class="ccp-status-grid">
         {{#each drawer.health.statuses}}
         <button type="button" id="ccp-status-{{id}}" class="ccp-status" data-action="toggleStatus" data-status-id="{{id}}" aria-pressed="{{#if active}}true{{else}}false{{/if}}" aria-label="{{name}}" data-tooltip="{{name}}" {{#unless @root.canEdit}}disabled{{/unless}}><img src="{{img}}" alt=""></button>
@@ -121,7 +140,7 @@
   {{/if}}
   {{#if drawer.style}}
   <header>
-    <h2>{{localize "CCP.Style.Title"}}</h2>
+    <h2><i class="fa-solid fa-palette" aria-hidden="true"></i>{{localize "CCP.Style.Title"}}</h2>
     <span class="ccp-note">{{#if drawer.style.isOverride}}{{localize "CCP.Style.Personal"}}{{else}}{{localize "CCP.Style.WorldDefault"}}{{/if}}</span>
   </header>
   <div class="ccp-style">
@@ -131,33 +150,36 @@
         {{#each drawer.style.presets}}
         <button type="button" id="ccp-swatch-{{id}}" class="ccp-swatch" data-action="previewAccent" data-hex="{{hex}}" style="--ccp-swatch: {{hex}}" aria-pressed="{{#if pressed}}true{{else}}false{{/if}}" aria-label="{{localize labelKey}}" data-tooltip="{{localize labelKey}}"></button>
         {{/each}}
-      </div>
-      <div class="ccp-picker">
-        <input type="color" id="ccp-accent-picker" value="{{drawer.style.accent}}" aria-label="{{localize 'CCP.Style.Picker'}}">
-        <input type="text" id="ccp-accent-hex" value="{{drawer.style.accent}}" aria-label="{{localize 'CCP.Style.Hex'}}" spellcheck="false" autocomplete="off" maxlength="7">
+        <span class="ccp-picker">
+          <input type="color" id="ccp-accent-picker" value="{{drawer.style.accent}}" aria-label="{{localize 'CCP.Style.Picker'}}">
+          <input type="text" id="ccp-accent-hex" value="{{drawer.style.accent}}" aria-label="{{localize 'CCP.Style.Hex'}}" spellcheck="false" autocomplete="off" maxlength="7">
+        </span>
       </div>
       <p class="ccp-style-contrast ccp-note">{{localize "CCP.Style.Contrast" ratio=drawer.style.inkContrast}}</p>
       <p class="ccp-style-conflict" role="status" hidden></p>
       <div class="ccp-style-actions">
-        <button type="button" id="ccp-style-save" class="ccp-key ccp-chamfer ccp-style-save" data-action="saveAccent" {{#if drawer.style.dirty}}data-dirty{{/if}}><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>{{localize "CCP.Style.Save"}}</button>
-        <button type="button" id="ccp-style-reset" class="ccp-key ccp-chamfer" data-action="resetAccent" {{#unless drawer.style.isOverride}}disabled{{/unless}}><i class="fa-solid fa-rotate-left" aria-hidden="true"></i>{{localize "CCP.Style.Reset"}}</button>
+        <button type="button" id="ccp-style-save" class="ccp-cell ccp-style-save" data-action="saveAccent" {{#if drawer.style.dirty}}data-dirty{{/if}}><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i><span>{{localize "CCP.Style.Save"}}</span></button>
+        <button type="button" id="ccp-style-reset" class="ccp-cell" data-action="resetAccent" {{#unless drawer.style.isOverride}}disabled{{/unless}}><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><span>{{localize "CCP.Style.Reset"}}</span></button>
         {{#if drawer.style.isGM}}
-        <button type="button" id="ccp-style-world" class="ccp-key ccp-chamfer" data-action="saveWorldAccent"><i class="fa-solid fa-globe" aria-hidden="true"></i>{{localize "CCP.Style.SetWorld"}}</button>
+        <button type="button" id="ccp-style-world" class="ccp-cell" data-action="saveWorldAccent"><i class="fa-solid fa-globe" aria-hidden="true"></i><span>{{localize "CCP.Style.SetWorld"}}</span></button>
         {{/if}}
       </div>
     </div>
     <div class="ccp-style-col">
       <h3>{{localize "CCP.Style.Layout"}}</h3>
-      {{#each drawer.style.prefs}}
-      <button type="button" id="ccp-pref-{{key}}" class="ccp-row ccp-pref" data-action="togglePref" data-pref="{{key}}" role="switch" aria-checked="{{#if on}}true{{else}}false{{/if}}">
-        <span>{{localize labelKey}}</span>
-        <i class="fa-solid {{#if on}}fa-toggle-on{{else}}fa-toggle-off{{/if}}" aria-hidden="true"></i>
-      </button>
-      {{/each}}
+      <div class="ccp-prefs">
+        {{#each drawer.style.prefs}}
+        <button type="button" id="ccp-pref-{{key}}" class="ccp-pref" data-action="togglePref" data-pref="{{key}}" role="switch" aria-checked="{{#if on}}true{{else}}false{{/if}}">
+          <span>{{localize labelKey}}</span><i class="ccp-switch" aria-hidden="true"></i>
+        </button>
+        {{/each}}
+      </div>
       <div class="ccp-dock-choice" role="group" aria-label="{{localize 'CCP.Settings.dock.Name'}}">
         <span>{{localize "CCP.Settings.dock.Name"}}</span>
-        <button type="button" id="ccp-dock-bottom" class="ccp-step ccp-chamfer" data-action="setDock" data-dock="bottom" aria-pressed="{{#if (eq drawer.style.dock 'bottom')}}true{{else}}false{{/if}}">{{localize "CCP.Settings.dock.Bottom"}}</button>
-        <button type="button" id="ccp-dock-top" class="ccp-step ccp-chamfer" data-action="setDock" data-dock="top" aria-pressed="{{#if (eq drawer.style.dock 'top')}}true{{else}}false{{/if}}">{{localize "CCP.Settings.dock.Top"}}</button>
+        <span class="ccp-seg">
+          <button type="button" id="ccp-dock-bottom" class="ccp-step" data-action="setDock" data-dock="bottom" aria-pressed="{{#if (eq drawer.style.dock 'bottom')}}true{{else}}false{{/if}}"><i class="fa-solid fa-arrow-down" aria-hidden="true"></i> {{localize "CCP.Settings.dock.Bottom"}}</button>
+          <button type="button" id="ccp-dock-top" class="ccp-step" data-action="setDock" data-dock="top" aria-pressed="{{#if (eq drawer.style.dock 'top')}}true{{else}}false{{/if}}"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i> {{localize "CCP.Settings.dock.Top"}}</button>
+        </span>
       </div>
     </div>
   </div>

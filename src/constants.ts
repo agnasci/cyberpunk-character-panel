@@ -19,3 +19,18 @@ export const SETTINGS = {
 } as const;
 
 export const KEYBINDING_TOGGLE = "togglePanel";
+
+export const PREFS_FLAG = "prefs";
+
+export const PLAYER_PREF_KEYS: readonly string[] = [
+  SETTINGS.enabled,
+  SETTINGS.followControlled,
+  SETTINGS.scale,
+  SETTINGS.dock,
+  SETTINGS.collapsed,
+  SETTINGS.animateMonitor,
+  SETTINGS.accent,
+  SETTINGS.compact,
+  SETTINGS.showFavorites,
+  SETTINGS.showBpm,
+];
