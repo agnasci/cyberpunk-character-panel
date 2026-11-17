@@ -139,6 +139,14 @@ declare global {
   };
 
   const CONST: { KEYBINDING_PRECEDENCE: { NORMAL: number } };
+
+  const ui: {
+    notifications: {
+      info(message: string): unknown;
+      warn(message: string): unknown;
+      error(message: string): unknown;
+    };
+  };
 }
 
 export {};

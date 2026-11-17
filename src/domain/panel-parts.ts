@@ -18,13 +18,15 @@ const RULES: ReadonlyArray<[RegExp, readonly PanelPart[]]> = [
   [/^system\.externalData\./, ["vitals"]],
   [/^system\.stats\.luck\./, ["vitals"]],
   [/^system\.stats\./, ["stats", "drawer"]],
+  [/^system\.(wealth|improvementPoints|reputation)\./, ["drawer"]],
 ];
 
 const ITEM_PARTS: Readonly<Record<string, readonly PanelPart[]>> = {
   role: ["identity", "drawer", "actions"],
   skill: ["drawer", "actions"],
   cyberdeck: ["drawer", "actions"],
-  criticalInjury: ["vitals"],
+  criticalInjury: ["vitals", "drawer"],
+  drug: ["drawer"],
   armor: ["vitals"],
 };
 

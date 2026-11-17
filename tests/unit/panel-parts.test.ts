@@ -21,7 +21,8 @@ describe("partsForActorChange", () => {
   });
 
   it("returns nothing for data the panel does not show yet", () => {
-    expect(partsForActorChange(["system.wealth.value", "_stats.modifiedTime"])).toEqual([]);
+    expect(partsForActorChange(["system.lifestyle.value", "_stats.modifiedTime"])).toEqual([]);
+    expect(partsForActorChange(["system.wealth.value"])).toEqual(["drawer"]);
   });
 
   it("keeps a stable order without duplicates", () => {
@@ -46,7 +47,8 @@ describe("other document changes", () => {
     expect(partsForItemChange("role")).toEqual(["drawer", "identity", "actions"]);
     expect(partsForItemChange("skill")).toEqual(["drawer", "actions"]);
     expect(partsForItemChange("cyberdeck")).toEqual(["drawer", "actions"]);
-    expect(partsForItemChange("criticalInjury")).toEqual(["vitals"]);
+    expect(partsForItemChange("criticalInjury")).toEqual(["drawer", "vitals"]);
+    expect(partsForItemChange("drug")).toEqual(["drawer"]);
     expect(partsForItemChange("weapon")).toEqual([]);
   });
 

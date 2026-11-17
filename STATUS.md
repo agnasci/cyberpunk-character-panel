@@ -4,63 +4,47 @@ Atualizado em: 2026-11-16.
 
 ## Situação
 
-- E0, E1, E2 e E3 concluídas. O painel tem identidade, biomonitor, HP/LUCK/Death Save,
-  Humanity, armadura (só leitura), grade de STATs, Facedown, gavetas de perícias, roles e NET, e
-  faixa de favoritas. Tudo rola pela ficha nativa.
-- Decisões pendentes resolvidas por delegação do usuário (2026-11-16): todas as linhas de
-  docs/DECISIONS.md estão confirmadas; D03a definiu a fronteira com o combate; D20–D23 novas.
+- E0 a E4 concluídas. O painel tem identidade, biomonitor, HP/LUCK/Death Save, Humanity, armadura
+  (só leitura), STATs, Facedown, perícias, roles, NET, favoritas, ledgers e saúde (lesões, drogas,
+  efeitos, status do token). Tudo pela ficha nativa.
+- Todas as decisões de docs/DECISIONS.md estão confirmadas (D03a define a fronteira com o combate).
 - Protótipo visual aprovado: `prototype/panel.html`, <https://claude.ai/artifact/UZxzG4ErvFhCc2L6mycLeY>.
-- Repositório privado: <https://github.com/agnasci/cyberpunk-character-panel> (`main`).
+- Repositório privado: <https://github.com/agnasci/cyberpunk-character-panel> (`main`); E3 em `d50bf4b`.
 
-## Última entrega: D03a + E2-05 + E3 (2026-11-16)
+## Última entrega: E4 — ficha rápida e saúde (2026-11-16)
 
-Arquivos novos: `src/domain/{sheet-lists,panel-views}.ts`, `src/integrations/cpr/sheet-adapter.ts`,
-`templates/{stats,actions,drawer}.hbs`, `tests/unit/{sheet-lists,panel-views,sheet-adapter}.test.ts`.
-Alterados: snapshot/adaptador (armadura, STATs), `character-actions.ts` (rolagens),
-`panel-parts.ts`, `view-model.ts`, `ui/character-panel-app.ts`, `vitals.hbs`, CSS, `lang/*.json`,
-docs (DECISIONS, COMPATIBILITY, ARCHITECTURE, PLAN).
+Arquivos novos: `src/domain/quick-sheet.ts`, `src/integrations/cpr/quick-sheet-adapter.ts`,
+`tests/unit/quick-sheet.test.ts`. Alterados: `panel-views.ts`, `panel-parts.ts`,
+`ui/character-panel-app.ts`, `templates/{actions,drawer}.hbs`, CSS, `lang/*.json`, `foundry.d.ts`,
+docs (DECISIONS D24–D25, COMPATIBILITY).
 
-- D03a: armadura só leitura no painel; ablação/dano e rolar lesão crítica no módulo de combate;
-  reparo na ficha; mods situacionais ficam no diálogo nativo de rolagem.
-- E2-05: chip de SP (cabeça, corpo, escudo) com os valores rastreados pela ficha.
-- E3-01: rolagens por `sheet._onRoll` com evento sintético (`buildRollEvent`); Ctrl pula o diálogo.
-- E3-02: grade 5×2 de STATs roláveis (ordem da ficha, LUCK/EMP com máx.) e botão Facedown.
-- E3-03: gaveta de perícias por categoria, total igual ao da ficha (D20), busca sem acento,
-  estrela que grava `system.favorite`, `*` quando há mod situacional.
-- E3-04: faixa de favoritas (só perícias, D21), some sem favoritas.
-- E3-05: gaveta de roles com habilidades roláveis (principal + sub, rank).
-- E3-06: gaveta NET com deck equipado (D22). Atalho para o Netrunner HUD **não feito**: a API
-  dele não expõe abrir a sessão (só `openPrototype`).
-- Layout responsivo (D23): o painel não alarga mais a coluna central; em largura menor os STATs
-  vão para uma linha própria.
+- E4-01: gaveta "Ficha rápida" com Eurobucks, IP (só `character`) e Reputação: quantia + motivo,
+  somar/subtrair/definir, botão do diálogo nativo do ledger (D24).
+- E4-02: lesões críticas com local e marca de Death Save +1; clique abre o item.
+- E4-03: efeitos ativos (próprios e de itens) com liga/desliga e abrir; grade dos 34 status do token.
+- E4-04: drogas com quantidade e "Consumir" pela confirmação nativa (`snort`), desabilitado em 0.
 
 Validação:
-- `npm run check` exit 0 (60 testes).
-- Manual real (Foundry 12.343, CPR v0.92.4, mundo `cyberdeck-hud`):
-  - Mestre: com efeito ativo (+2 Perception) e mod situacional (+1 Stealth), os 63 totais do
-    painel = coluna base da ficha. Busca real "perc" → 2 perícias em 2 grupos; "zzz" → aviso;
-    Esc limpa. Estrela grava `favorite`, a faixa atualiza e a busca continua aplicada. Cards
-    nativos de perícia (gaveta e faixa), STAT, Facedown, habilidade de role e Interface. Sem role
-    de NET: aviso nativo, sem card; com role: card de Interface. Chip de armadura "HEAD 11/11
-    BODY 9/11" igual a `externalData`. Alt+C real recolhe/expande sem abrir a ficha (C do núcleo).
-    Largura 796 px: classe `ccp-narrow`, STATs em linha própria, coluna central não alarga.
-  - Jogador (Runner Teste): cards de STAT, Interface e perícia com autor = jogador; sem Ctrl o
-    diálogo nativo mostra o mod situacional "CCP Teste efeito".
-  - Console: só os avisos nativos esperados e erros de render da ficha causados por um efeito de
-    teste mal formado criado por mim (apagado; ver COMPATIBILITY).
-- Não testado: Firefox e Electron; `ccp-tiny` (< 560 px) só por CSS; pt-BR em execução; escudo
-  rastreado (sem item de escudo no mundo de teste); posição "em cima" com gaveta aberta.
+- `npm run check` exit 0 (71 testes).
+- Manual real como jogador (Runner Teste, Foundry 12.343, CPR v0.92.4):
+  - Ledger com digitação real: −50 eb com motivo → 350 e transação "Teste painel - Runner Teste";
+    IP definido 25; Reputação +1 sem motivo; quantia "abc" → aviso e foco no campo; −500 eb → aviso
+    nativo "You lost more Eurobucks than you have!" e saldo −150 (igual à ficha); diálogo nativo
+    "Eurobucks Ledger" abriu. Valores restaurados (400 eb, IP 10, Rep 1) pelo próprio ledger.
+  - Saúde: lesão criada com Death Save +1 subiu o Death Save do painel na hora; clique abriu o
+    item. Efeito desligado/religado (linha esmaecida). Status "prone" ligado/desligado pela grade.
+    Droga: confirmação nativa, quantidade 2 → 1, notificação do sistema.
+  - Visual das duas gavetas conferido em captura. Console sem erros além do aviso de quantia inválida.
+- Não testado: ledgers de mook (só Reputação; coberto por teste unitário); mestre na gaveta Saúde;
+  Firefox e Electron; pt-BR em execução.
 
-Mundo de teste: "CCP Teste — Personagem" ganhou itens com a flag `cyberpunk-character-panel.probe`
-(armadura equipada SP 11 com ablação 2 no corpo, deck equipado, role Netrunner 4 como role de
-NET) e o efeito "CCP Teste efeito"; INT 8, Perception nível 4, Perception e Stealth favoritas.
-Último login no navegador do app: Runner Teste. Pode ter ficado um diálogo de rolagem do CPR preso
-na aba do jogador (fechada).
+Mundo de teste: o personagem de teste tem também "CCP Teste Lesão" (cabeça, Death Save +1) e
+"CCP Teste Droga" (×1), com a flag `cyberpunk-character-panel.probe`; ledgers com transações de
+teste. Último login no navegador do app: Runner Teste.
 
 ## Aguardando o usuário
 
-Nada bloqueia. Itens que dependem de outro projeto: atalho para o Netrunner HUD (expor abertura da
-sessão na API dele).
+Nada bloqueia. Depende de outro projeto: atalho para o Netrunner HUD (expor abertura da sessão).
 
 ## Próximas tarefas
 
@@ -68,10 +52,9 @@ Estados: `TODO`. Uma tarefa por vez; detalhe em docs/PLAN.md.
 
 | ID | Estado | Entrega | Condição |
 |---|---|---|---|
-| E4-01 | TODO | Ledgers: Eurobucks, IP, Reputação, com motivo | Pode começar |
-| E4-02 | TODO | Lesões críticas atuais (abrir item) | Pode começar |
-| E4-03 | TODO | Status de token e efeitos ativos | Pode começar |
-| E4-04 | TODO | Drogas carregadas: usar | Pode começar |
+| E5-01 | TODO | Paleta derivada e contraste (D09) | Pode começar |
+| E5-02 | TODO | Editor de cor com prévia e predefinições | Depois de E5-01 |
+| E5-03 | TODO | Seções visíveis, modo compacto, animações, posição | Pode começar |
 
 ## Pendências abertas
 

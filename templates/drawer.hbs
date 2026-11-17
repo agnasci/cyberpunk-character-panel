@@ -49,4 +49,74 @@
     {{/each}}
   </div>
   {{/if}}
+  {{#if drawer.ledgers}}
+  <header>
+    <h2>{{localize "CCP.Drawer.Sheet"}}</h2>
+    <span class="ccp-note">{{localize "CCP.Ledger.Note"}}</span>
+  </header>
+  <div class="ccp-ledgers">
+    {{#each drawer.ledgers}}
+    <div class="ccp-ledger ccp-chamfer" data-prop="{{prop}}">
+      <div class="ccp-ledger-head">
+        <span class="ccp-ledger-label">{{localize labelKey}}</span>
+        <button type="button" id="ccp-led-open-{{prop}}" class="ccp-mini-btn" data-action="openLedger" data-prop="{{prop}}" aria-label="{{localize 'CPR.ledger.ledgerOpen'}}" data-tooltip="{{localize 'CPR.ledger.ledgerOpen'}}"><i class="fa-solid fa-note-sticky" aria-hidden="true"></i></button>
+      </div>
+      <b class="ccp-ledger-value">{{value}}{{#if unit}} <small>{{unit}}</small>{{/if}}</b>
+      {{#if @root.canEdit}}
+      <div class="ccp-ledger-form">
+        <input type="text" inputmode="numeric" id="ccp-led-amount-{{prop}}" class="ccp-ledger-amount" placeholder="{{localize 'CCP.Ledger.Amount'}}" aria-label="{{localize 'CCP.Ledger.Amount'}}: {{localize labelKey}}" autocomplete="off">
+        <input type="text" id="ccp-led-reason-{{prop}}" class="ccp-ledger-reason" placeholder="{{localize 'CCP.Ledger.Reason'}}" aria-label="{{localize 'CCP.Ledger.Reason'}}: {{localize labelKey}}" autocomplete="off">
+        <div class="ccp-ledger-btns">
+          <button type="button" id="ccp-led-add-{{prop}}" class="ccp-step ccp-chamfer" data-action="changeLedger" data-prop="{{prop}}" data-mode="add" aria-label="{{localize 'CCP.Ledger.Add'}}" data-tooltip="{{localize 'CCP.Ledger.Add'}}"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
+          <button type="button" id="ccp-led-sub-{{prop}}" class="ccp-step ccp-chamfer" data-action="changeLedger" data-prop="{{prop}}" data-mode="subtract" aria-label="{{localize 'CCP.Ledger.Subtract'}}" data-tooltip="{{localize 'CCP.Ledger.Subtract'}}"><i class="fa-solid fa-minus" aria-hidden="true"></i></button>
+          <button type="button" id="ccp-led-set-{{prop}}" class="ccp-step ccp-chamfer" data-action="changeLedger" data-prop="{{prop}}" data-mode="set" aria-label="{{localize 'CCP.Ledger.Set'}}" data-tooltip="{{localize 'CCP.Ledger.Set'}}"><i class="fa-solid fa-equals" aria-hidden="true"></i></button>
+        </div>
+      </div>
+      {{/if}}
+    </div>
+    {{/each}}
+  </div>
+  {{/if}}
+  {{#if drawer.health}}
+  <header><h2>{{localize "CCP.Drawer.Health"}}</h2></header>
+  <div class="ccp-health">
+    <div class="ccp-health-col">
+      <h3>{{localize "CCP.Health.Injuries"}}</h3>
+      {{#each drawer.health.injuries}}
+      <button type="button" id="ccp-inj-{{id}}" class="ccp-row" data-action="openItem" data-item-type="criticalInjury" data-item-id="{{id}}">
+        <span>{{name}}</span>
+        <small>{{localize locationKey}}{{#if deathSaveIncrease}} · <i class="fa-solid fa-skull" aria-hidden="true"></i> {{localize "CCP.Health.DeathSavePlus"}}{{/if}}</small>
+      </button>
+      {{else}}
+      <p class="ccp-empty">{{localize "CCP.Health.NoInjuries"}}</p>
+      {{/each}}
+      <h3>{{localize "CCP.Health.Drugs"}}</h3>
+      {{#each drawer.health.drugs}}
+      <div class="ccp-row ccp-row-static">
+        <button type="button" id="ccp-drug-open-{{id}}" class="ccp-row-link" data-action="openItem" data-item-type="drug" data-item-id="{{id}}">{{name}} <small>×{{amount}}</small></button>
+        {{#if @root.canEdit}}<button type="button" id="ccp-drug-use-{{id}}" class="ccp-step ccp-chamfer" data-action="useDrug" data-item-id="{{id}}" {{#unless usable}}disabled{{/unless}}><i class="fa-solid fa-pills" aria-hidden="true"></i> {{localize "CPR.global.generic.snort"}}</button>{{/if}}
+      </div>
+      {{else}}
+      <p class="ccp-empty">{{localize "CCP.Health.NoDrugs"}}</p>
+      {{/each}}
+    </div>
+    <div class="ccp-health-col">
+      <h3>{{localize "CCP.Health.Effects"}}</h3>
+      {{#each drawer.health.effects}}
+      <div class="ccp-row ccp-row-static{{#if disabled}} ccp-off{{/if}}">
+        <button type="button" id="ccp-eff-open-{{@index}}" class="ccp-row-link" data-action="openEffect" data-effect-uuid="{{uuid}}">{{#if img}}<img src="{{img}}" alt="">{{/if}}{{name}}{{#if source}} <small>{{source}}</small>{{/if}}</button>
+        {{#if @root.canEdit}}<button type="button" id="ccp-eff-toggle-{{@index}}" class="ccp-mini-btn" data-action="toggleEffect" data-effect-uuid="{{uuid}}" aria-pressed="{{#if disabled}}false{{else}}true{{/if}}" aria-label="{{localize 'CCP.Health.ToggleEffect'}}: {{name}}" data-tooltip="{{localize 'CCP.Health.ToggleEffect'}}"><i class="fa-solid {{#if disabled}}fa-toggle-off{{else}}fa-toggle-on{{/if}}" aria-hidden="true"></i></button>{{/if}}
+      </div>
+      {{else}}
+      <p class="ccp-empty">{{localize "CCP.Health.NoEffects"}}</p>
+      {{/each}}
+      <h3>{{localize "CCP.Health.Statuses"}}</h3>
+      <div class="ccp-status-grid">
+        {{#each drawer.health.statuses}}
+        <button type="button" id="ccp-status-{{id}}" class="ccp-status" data-action="toggleStatus" data-status-id="{{id}}" aria-pressed="{{#if active}}true{{else}}false{{/if}}" aria-label="{{name}}" data-tooltip="{{name}}" {{#unless @root.canEdit}}disabled{{/unless}}><img src="{{img}}" alt=""></button>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+  {{/if}}
 </section>

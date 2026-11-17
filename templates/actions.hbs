@@ -9,6 +9,10 @@
   {{#if actions.hasNet}}
   <button type="button" id="ccp-key-net" class="ccp-key ccp-chamfer" data-action="toggleDrawer" data-drawer="net" aria-expanded="{{#if (eq actions.open 'net')}}true{{else}}false{{/if}}" aria-controls="ccp-drawer"><i class="fa-solid fa-network-wired" aria-hidden="true"></i>{{localize "CCP.Drawer.Net"}}</button>
   {{/if}}
+  {{#if actions.hasSheet}}
+  <button type="button" id="ccp-key-sheet" class="ccp-key ccp-chamfer" data-action="toggleDrawer" data-drawer="sheet" aria-expanded="{{#if (eq actions.open 'sheet')}}true{{else}}false{{/if}}" aria-controls="ccp-drawer"><i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i>{{localize "CCP.Drawer.Sheet"}}</button>
+  {{/if}}
+  <button type="button" id="ccp-key-health" class="ccp-key ccp-chamfer" data-action="toggleDrawer" data-drawer="health" aria-expanded="{{#if (eq actions.open 'health')}}true{{else}}false{{/if}}" aria-controls="ccp-drawer"><i class="fa-solid fa-heart-pulse" aria-hidden="true"></i>{{localize "CCP.Drawer.Health"}}</button>
   {{#if canEdit}}
   <button type="button" id="ccp-key-facedown" class="ccp-key ccp-chamfer" data-action="rollFacedown" data-tooltip="{{localize 'CPR.characterSheet.bottomPane.fight.facedown'}}"><i class="fa-regular fa-face-angry" aria-hidden="true"></i>{{localize "CCP.Drawer.Facedown"}}</button>
   {{/if}}

@@ -44,7 +44,7 @@ describe("panel views", () => {
   });
 
   it("only offers drawers that have content", () => {
-    const actions = buildActionsView("net", { skills, roles, net: null });
+    const actions = buildActionsView("net", { skills, roles, net: null, ledgers: [] });
     expect(actions).toMatchObject({ open: null, hasSkills: true, hasRoles: true, hasNet: false });
     expect(actions.favorites.map((s) => s.id)).toEqual(["s1"]);
   });
@@ -55,6 +55,8 @@ describe("panel views", () => {
       skills: null,
       roles: null,
       net: null,
+      ledgers: null,
+      health: null,
     });
     expect(buildDrawerView("roles", { roles }).roles?.map((r) => r.id)).toEqual(["r2"]);
     expect(buildDrawerView("skills", { skills }).skills?.[0]?.skills[0]).toMatchObject({

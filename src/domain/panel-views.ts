@@ -1,4 +1,14 @@
 import {
+  buildLedgerViews,
+  type DrugEntry,
+  type EffectEntry,
+  type InjuryEntry,
+  injuryLocationKey,
+  type LedgerEntry,
+  type LedgerView,
+  type StatusEntry,
+} from "./quick-sheet";
+import {
   favoriteSkills,
   groupSkills,
   type NetEntry,
@@ -9,7 +19,14 @@ import {
   type StatEntry,
 } from "./sheet-lists";
 
-export type DrawerId = "skills" | "roles" | "net";
+export type DrawerId = "skills" | "roles" | "net" | "sheet" | "health";
+
+export interface HealthView {
+  injuries: (InjuryEntry & { locationKey: string })[];
+  drugs: (DrugEntry & { usable: boolean })[];
+  effects: EffectEntry[];
+  statuses: StatusEntry[];
+}
 
 export const INTERFACE_ABILITIES = [
   "scanner",
@@ -43,6 +60,8 @@ export interface DrawerView {
   skills: (Omit<SkillGroup, "skills"> & { skills: SkillView[] })[] | null;
   roles: RoleEntry[] | null;
   net: (NetEntry & { abilities: InterfaceView[] }) | null;
+  ledgers: LedgerView[] | null;
+  health: HealthView | null;
 }
 
 export interface ActionsView {
@@ -50,6 +69,7 @@ export interface ActionsView {
   hasSkills: boolean;
   hasRoles: boolean;
   hasNet: boolean;
+  hasSheet: boolean;
   favorites: SkillEntry[];
 }
 
@@ -86,6 +106,11 @@ export function buildDrawerView(
     skills?: readonly SkillEntry[] | undefined;
     roles?: readonly RoleEntry[] | undefined;
     net?: NetEntry | null | undefined;
+    ledgers?: readonly LedgerEntry[] | undefined;
+    injuries?: readonly InjuryEntry[] | undefined;
+    drugs?: readonly DrugEntry[] | undefined;
+    effects?: readonly EffectEntry[] | undefined;
+    statuses?: readonly StatusEntry[] | undefined;
   },
 ): DrawerView {
   const skills =
@@ -102,22 +127,51 @@ export function buildDrawerView(
   const roles = open === "roles" && source.roles ? rollableRoles(source.roles) : null;
   const net =
     open === "net" && source.net ? { ...source.net, abilities: interfaceAbilities() } : null;
-  return { open, skills, roles, net };
+  const ledgers =
+    open === "sheet" && source.ledgers && source.ledgers.length > 0
+      ? buildLedgerViews(source.ledgers)
+      : null;
+  const health =
+    open === "health"
+      ? {
+          injuries: (source.injuries ?? []).map((i) => ({
+            ...i,
+            locationKey: injuryLocationKey(i.location),
+          })),
+          drugs: (source.drugs ?? []).map((d) => ({ ...d, usable: d.amount > 0 })),
+          effects: [...(source.effects ?? [])],
+          statuses: [...(source.statuses ?? [])],
+        }
+      : null;
+  return { open, skills, roles, net, ledgers, health };
 }
 
 export function buildActionsView(
   open: DrawerId | null,
-  source: { skills: readonly SkillEntry[]; roles: readonly RoleEntry[]; net: NetEntry | null },
+  source: {
+    skills: readonly SkillEntry[];
+    roles: readonly RoleEntry[];
+    net: NetEntry | null;
+    ledgers: readonly LedgerEntry[];
+  },
 ): ActionsView {
   const hasSkills = source.skills.length > 0;
   const hasRoles = rollableRoles(source.roles).length > 0;
   const hasNet = source.net !== null;
-  const available: Record<DrawerId, boolean> = { skills: hasSkills, roles: hasRoles, net: hasNet };
+  const hasSheet = source.ledgers.length > 0;
+  const available: Record<DrawerId, boolean> = {
+    skills: hasSkills,
+    roles: hasRoles,
+    net: hasNet,
+    sheet: hasSheet,
+    health: true,
+  };
   return {
     open: open && available[open] ? open : null,
     hasSkills,
     hasRoles,
     hasNet,
+    hasSheet,
     favorites: favoriteSkills(source.skills),
   };
 }

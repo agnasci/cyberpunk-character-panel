@@ -24,7 +24,27 @@ import {
   setLuck,
 } from "../integrations/cpr/character-actions";
 import { readCharacterSnapshot } from "../integrations/cpr/character-adapter";
+import {
+  applyLedgerChange,
+  openEffect,
+  openItem,
+  openLedger,
+  readDrugs,
+  readEffects,
+  readInjuries,
+  readLedgers,
+  readStatuses,
+  toggleEffect,
+  toggleStatus,
+  useDrug,
+} from "../integrations/cpr/quick-sheet-adapter";
 import { readNet, readRoles, readSkills, toggleFavorite } from "../integrations/cpr/sheet-adapter";
+import {
+  isLedgerMode,
+  isLedgerProp,
+  parseLedgerAmount,
+  planLedgerChange,
+} from "../domain/quick-sheet";
 import type { ResolvedSubject } from "../integrations/cpr/subject-resolver";
 import { type PanelSettings, saveCollapsed } from "../settings";
 
@@ -61,13 +81,20 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
       toggleFavorite: CharacterPanelApp.#onToggleFavorite,
       rollRole: CharacterPanelApp.#onRollRole,
       rollInterface: CharacterPanelApp.#onRollInterface,
+      changeLedger: CharacterPanelApp.#onChangeLedger,
+      openLedger: CharacterPanelApp.#onOpenLedger,
+      openItem: CharacterPanelApp.#onOpenItem,
+      useDrug: CharacterPanelApp.#onUseDrug,
+      toggleEffect: CharacterPanelApp.#onToggleEffect,
+      openEffect: CharacterPanelApp.#onOpenEffect,
+      toggleStatus: CharacterPanelApp.#onToggleStatus,
     },
   };
 
   static PARTS = {
     drawer: {
       template: `modules/${MODULE_ID}/templates/drawer.hbs`,
-      scrollable: [".ccp-skill-cols"],
+      scrollable: [".ccp-skill-cols", ".ccp-health"],
     },
     identity: { template: `modules/${MODULE_ID}/templates/identity.hbs` },
     vitals: { template: `modules/${MODULE_ID}/templates/vitals.hbs` },
@@ -167,6 +194,7 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
         skills: readSkills(actor),
         roles: readRoles(actor),
         net: readNet(actor),
+        ledgers: readLedgers(actor),
       });
       return { ...base, actions };
     }
@@ -176,8 +204,14 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
         skills: open === "skills" ? readSkills(actor) : undefined,
         roles: open === "roles" ? readRoles(actor) : undefined,
         net: open === "net" ? readNet(actor) : undefined,
+        ledgers: open === "sheet" ? readLedgers(actor) : undefined,
+        injuries: open === "health" ? readInjuries(actor) : undefined,
+        drugs: open === "health" ? readDrugs(actor) : undefined,
+        effects: open === "health" ? readEffects(actor) : undefined,
+        statuses: open === "health" ? readStatuses(actor) : undefined,
       });
-      const empty = !drawer.skills && !drawer.roles && !drawer.net;
+      const empty =
+        !drawer.skills && !drawer.roles && !drawer.net && !drawer.ledgers && !drawer.health;
       return { ...base, drawer: empty ? { ...drawer, open: null } : drawer };
     }
     return base;
@@ -463,5 +497,62 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
     const actor = this.#actor();
     const { ability, deckId } = target.dataset;
     if (actor && ability && deckId) await rollInterface(actor, ability, deckId, modifiersOf(event));
+  }
+
+  static async #onChangeLedger(this: CharacterPanelApp, _event: Event, target: HTMLElement) {
+    const actor = this.#actor();
+    const { prop, mode } = target.dataset;
+    if (!actor || !prop || !mode || !isLedgerProp(prop) || !isLedgerMode(mode)) return;
+    const card = target.closest<HTMLElement>(".ccp-ledger");
+    const amountInput = card?.querySelector<HTMLInputElement>(".ccp-ledger-amount");
+    const reasonInput = card?.querySelector<HTMLInputElement>(".ccp-ledger-reason");
+    const amount = parseLedgerAmount(amountInput?.value ?? "");
+    if (amount === null) {
+      ui.notifications.error(game.i18n.localize("CCP.Ledger.InvalidAmount"));
+      amountInput?.focus();
+      return;
+    }
+    const current = readLedgers(actor).find((l) => l.prop === prop)?.value;
+    if (current === undefined) return;
+    const change = planLedgerChange(prop, mode, current, amount);
+    if (change.warningKey) ui.notifications.warn(game.i18n.localize(change.warningKey));
+    this.#refocus = target.id;
+    await applyLedgerChange(actor, change, reasonInput?.value ?? "");
+  }
+
+  static async #onOpenLedger(this: CharacterPanelApp, _event: Event, target: HTMLElement) {
+    const actor = this.#resolved?.actor;
+    const prop = target.dataset.prop;
+    if (actor && prop && isLedgerProp(prop)) await openLedger(actor, prop);
+  }
+
+  static #onOpenItem(this: CharacterPanelApp, _event: Event, target: HTMLElement): void {
+    const actor = this.#resolved?.actor;
+    const { itemType, itemId } = target.dataset;
+    if (actor && itemType && itemId) openItem(actor, itemType, itemId);
+  }
+
+  static async #onUseDrug(this: CharacterPanelApp, _event: Event, target: HTMLElement) {
+    const actor = this.#actor();
+    const id = target.dataset.itemId;
+    if (actor && id) await useDrug(actor, id);
+  }
+
+  static async #onToggleEffect(this: CharacterPanelApp, _event: Event, target: HTMLElement) {
+    const actor = this.#actor();
+    const uuid = target.dataset.effectUuid;
+    if (actor && uuid) await toggleEffect(actor, uuid);
+  }
+
+  static #onOpenEffect(this: CharacterPanelApp, _event: Event, target: HTMLElement): void {
+    const actor = this.#resolved?.actor;
+    const uuid = target.dataset.effectUuid;
+    if (actor && uuid) openEffect(actor, uuid);
+  }
+
+  static async #onToggleStatus(this: CharacterPanelApp, _event: Event, target: HTMLElement) {
+    const actor = this.#actor();
+    const id = target.dataset.statusId;
+    if (actor && id) await toggleStatus(actor, id);
   }
 }

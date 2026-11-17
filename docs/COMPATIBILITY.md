@@ -138,6 +138,19 @@ foi testado em execução no Netrunner HUD, não nesta etapa.
 - Núcleo da V12 usa C (ficha), Shift+C e Ctrl+C; Alt+C real recolhe o painel sem abrir a ficha.
 - `#interface` é flex: conteúdo com `max-content` dentro de `#ui-bottom` alarga `#ui-middle`.
 
+## Fatos confirmados na E4 (testado em execução em 2026-11-16)
+
+- Ficha: `_updateEurobucks` e o diálogo `CPRLedger` gravam com motivo `${motivo} - ${usuário}`;
+  subtrair abaixo de zero só avisa (`CPR.messages.warningNotEnough*`). `deltaLedgerProperty` e
+  `setLedgerProperty` chamados pelo jogador dono gravam valor e transação.
+- `actor.sheet.showLedger(prop)` abre o diálogo nativo do ledger sem a ficha aberta.
+- `criticalInjury.system.{location, deathSaveIncrease}`; criar lesão com `deathSaveIncrease` soma 1
+  à `deathSave.basePenalty` na hora (o painel atualiza pelo hook de item).
+- `drug.snort()` pede confirmação nativa, desconta `system.amount` e notifica.
+- `CONFIG.statusEffects` na V12 tem 34 status padrão (`id`, `name`, `img`); `toggleStatusEffect`
+  cria/apaga o efeito do status, que dispara os hooks de efeito.
+- Digitar em `<input>` do painel não aciona atalhos do Foundry.
+
 ## Fatos de dados confirmados em execução (E0-02)
 
 - Ator criado por `CONFIG.Actor.documentClass.create` (character ou mook) recebe 63 perícias
