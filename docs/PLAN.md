@@ -29,7 +29,7 @@ Requisitos R01–R10 em [SPEC.md](../SPEC.md). Apagar este arquivo quando o plan
 | E2-02 | HP: barra segmentada, ±1/±5, valor direto com limites | Grava como a ficha; jogador sem posse não consegue alterar |
 | E2-03 | Biomonitor (D08) | 6 estados conferidos na tela; pausa recolhido/aba oculta/reduced motion; sem rAF contínuo |
 | E2-04 | Humanity, LUCK ±, Death Save (rolar, aumentar, zerar) | Card nativo igual ao da ficha; LUCK limitada a 0..máx |
-| E2-05 | Armadura (só se D03a confirmar) | Mesmos valores e ablação da ficha |
+| E2-05 | Armadura só leitura (D03a): SP atual/máx. de cabeça e corpo, HP do escudo | Mesmos valores rastreados pela ficha |
 
 ## E3 — Atributos e rolagens
 
@@ -40,7 +40,7 @@ Requisitos R01–R10 em [SPEC.md](../SPEC.md). Apagar este arquivo quando o plan
 | E3-03 | Gaveta de perícias: categorias, total, busca, favoritas | Total igual ao da ficha com efeitos ativos; favorito grava `system.favorite` |
 | E3-04 | Faixa de favoritas | Ordem estável; some sem favoritas |
 | E3-05 | Gaveta de roles (principal e sub-habilidades) | Rolagem igual à ficha |
-| E3-06 | Gaveta NET (Interface) e atalho para o Netrunner HUD se ativo | Só aparece com deck equipado + role de Netrunning; erro nativo sem role |
+| E3-06 | Gaveta NET (Interface); atalho para o Netrunner HUD depende de a API dele expor a abertura da sessão | Só aparece com deck equipado; sem role de NET escolhida, erro nativo (D22) |
 
 ## E4 — Ficha rápida e saúde (itens sujeitos à revisão do usuário)
 

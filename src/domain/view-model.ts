@@ -1,5 +1,5 @@
 import { buildMonitor, type MonitorView } from "./biomonitor";
-import type { CharacterSnapshot, DeathSaveSnapshot, Pool } from "./character";
+import type { ArmorSnapshot, CharacterSnapshot, DeathSaveSnapshot, Pool } from "./character";
 import { plainText } from "./plain-text";
 import { type VitalState, vitalState } from "./vital-state";
 
@@ -22,6 +22,7 @@ export interface VitalsView {
   humanity: Pool | null;
   luck: (Pool & { canSpend: boolean; canRecover: boolean }) | null;
   deathSave: DeathSaveSnapshot | null;
+  armor: ArmorSnapshot | null;
 }
 
 export interface PanelView {
@@ -44,6 +45,10 @@ export function hpPercent(value: number, max: number): number {
   return Math.round((Math.min(Math.max(value, 0), max) / max) * 100);
 }
 
+function hasArmor(armor: ArmorSnapshot): boolean {
+  return armor.head !== null || armor.body !== null || armor.shield !== null;
+}
+
 export function buildPanelView(snapshot: CharacterSnapshot): PanelView {
   const state = vitalState(snapshot.woundState, snapshot.dead);
   const luck = snapshot.luck;
@@ -64,6 +69,7 @@ export function buildPanelView(snapshot: CharacterSnapshot): PanelView {
       humanity: snapshot.actorType === "character" ? snapshot.humanity : null,
       luck: luck ? { ...luck, canSpend: luck.value > 0, canRecover: luck.value < luck.max } : null,
       deathSave: snapshot.deathSave,
+      armor: hasArmor(snapshot.armor) ? snapshot.armor : null,
     },
     canEdit: snapshot.canEdit,
   };

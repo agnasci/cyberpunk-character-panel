@@ -1,0 +1,52 @@
+<section class="ccp-drawer" id="ccp-drawer" {{#unless drawer.open}}hidden{{/unless}}>
+  {{#if drawer.skills}}
+  <header>
+    <h2>{{localize "CCP.Drawer.Skills"}}</h2>
+    <input type="search" id="ccp-skill-search" class="ccp-search" placeholder="{{localize 'CCP.Skills.Search'}}" aria-label="{{localize 'CCP.Skills.Search'}}" autocomplete="off">
+  </header>
+  <div class="ccp-skill-cols">
+    {{#each drawer.skills}}
+    <div class="ccp-skill-group" data-category="{{category}}">
+      <h3>{{localize labelKey}}</h3>
+      {{#each skills}}
+      <div class="ccp-skill" data-search="{{search}}">
+        <button type="button" id="ccp-fav-toggle-{{id}}" class="ccp-star" data-action="toggleFavorite" data-skill-id="{{id}}" aria-pressed="{{#if favorite}}true{{else}}false{{/if}}" aria-label="{{localize 'CCP.Skills.Favorite'}}: {{label}}" data-tooltip="{{localize 'CCP.Skills.Favorite'}}" {{#unless @root.canEdit}}disabled{{/unless}}><i class="fa-{{#if favorite}}solid{{else}}regular{{/if}} fa-star" aria-hidden="true"></i></button>
+        <button type="button" id="ccp-skill-{{id}}" class="ccp-skill-roll" data-action="rollSkill" data-skill-id="{{id}}" {{#unless @root.canEdit}}disabled{{/unless}}>
+          <span class="ccp-skill-name">{{label}}</span>
+          <span class="ccp-skill-calc{{#if situational}} ccp-situational{{/if}}">{{localize statLabelKey}} + {{level}}{{#if mod}} {{#if (gt mod 0)}}+{{/if}}{{mod}}{{/if}}</span>
+          <b class="ccp-skill-total">{{total}}</b>
+        </button>
+      </div>
+      {{/each}}
+    </div>
+    {{/each}}
+  </div>
+  <p class="ccp-empty" hidden>{{localize "CCP.Skills.NoMatch"}}</p>
+  {{/if}}
+  {{#if drawer.roles}}
+  <header><h2>{{localize "CCP.Drawer.Roles"}}</h2></header>
+  <div class="ccp-role-list">
+    {{#each drawer.roles}}
+    <div class="ccp-role-block{{#if active}} ccp-active{{/if}}">
+      <h3>{{label}} <b>{{rank}}</b></h3>
+      <div class="ccp-btn-grid">
+        {{#each abilities}}
+        <button type="button" id="ccp-role-{{../id}}-{{@index}}" class="ccp-key ccp-chamfer" data-action="rollRole" data-role-id="{{../id}}" data-subtype="{{subtype}}" data-ability="{{name}}" {{#unless @root.canEdit}}disabled{{/unless}}>{{label}} <b>{{rank}}</b></button>
+        {{/each}}
+      </div>
+    </div>
+    {{/each}}
+  </div>
+  {{/if}}
+  {{#if drawer.net}}
+  <header>
+    <h2>{{localize "CCP.Drawer.Net"}}</h2>
+    <span class="ccp-note">{{drawer.net.deckName}}{{#if drawer.net.netRoleLabel}} · {{drawer.net.netRoleLabel}}{{else}} · {{localize "CCP.Net.NoRole"}}{{/if}}</span>
+  </header>
+  <div class="ccp-btn-grid">
+    {{#each drawer.net.abilities}}
+    <button type="button" id="ccp-net-{{key}}" class="ccp-key ccp-chamfer" data-action="rollInterface" data-ability="{{key}}" data-deck-id="{{@root.drawer.net.deckId}}" {{#unless @root.canEdit}}disabled{{/unless}}>{{localize labelKey}}</button>
+    {{/each}}
+  </div>
+  {{/if}}
+</section>

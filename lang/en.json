@@ -31,5 +31,18 @@
   "CCP.Vital.LuckRecover": "Recover 1 LUCK",
   "CCP.Vital.DeathSave": "DEATH SAVE",
   "CCP.Settings.animateMonitor.Name": "Animate biomonitor",
-  "CCP.Settings.animateMonitor.Hint": "Animate the heartbeat trace. When off, the trace stays still. The system reduced-motion preference also stops it."
+  "CCP.Settings.animateMonitor.Hint": "Animate the heartbeat trace. When off, the trace stays still. The system reduced-motion preference also stops it.",
+  "CCP.Drawer.Skills": "Skills",
+  "CCP.Drawer.Roles": "Roles",
+  "CCP.Drawer.Net": "NET",
+  "CCP.Drawer.Facedown": "Facedown",
+  "CCP.Skills.Favorites": "Favorites",
+  "CCP.Skills.Favorite": "Favorite",
+  "CCP.Skills.Search": "Search skills…",
+  "CCP.Skills.NoMatch": "No skill matches the search.",
+  "CCP.Net.NoRole": "no NET role selected on the sheet",
+  "CCP.Armor.Label": "Armor SP",
+  "CCP.Armor.Head": "HEAD",
+  "CCP.Armor.Body": "BODY",
+  "CCP.Armor.Shield": "SHIELD"
 }

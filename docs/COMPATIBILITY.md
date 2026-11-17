@@ -119,6 +119,25 @@ foi testado em execução no Netrunner HUD, não nesta etapa.
 - Com o painel do app oculto, a página não tem foco (`blur` programático não dispara) e transições
   CSS não avançam; conferir esses pontos com o painel visível.
 
+## Fatos confirmados na E3 (testado em execução em 2026-11-16)
+
+- Total da perícia na ficha = `level` + `cprGetSkillModInfo(nome, ator, "modTotal")` (sem mods
+  situacionais) + valor do STAT. Os helpers estão em `Handlebars.helpers` depois do `init` do sistema.
+- Nome traduzido: `cprGetLocalizedlNameKey(item)` ou `(nome, "roleAbility")` devolve a chave
+  `CPR.global...`; perícia customizada não tem chave e fica com o nome do item.
+- Rolagens pelo painel (evento sintético com `type: "click"`): STAT (`rollTitle` = chave do STAT),
+  Facedown (`rollTitle` traduzido), perícia (`rollTitle` = nome, `itemId`), role
+  (`rollSubtype`, `rollTitle` = nome da habilidade, `itemId` da role), Interface
+  (`interfaceAbility`, `cyberdeckId`). Card nativo com o jogador como autor; sem Ctrl abre o
+  diálogo nativo, que lista os mods situacionais do ator.
+- Interface sem `roleInfo.activeNetRole` válido: aviso nativo "No Netrunning role configured", sem card.
+- `updateTrackedArmor("body" | "head", id)` preenche `externalData.currentArmor*` com
+  `value = sp - ablation`.
+- Efeito ativo criado sem `flags["cyberpunk-red-core"].changes` quebra o render da ficha
+  (`CPRMod` lê esses flags); para testes, criar com `cats` e `situational` por mudança.
+- Núcleo da V12 usa C (ficha), Shift+C e Ctrl+C; Alt+C real recolhe o painel sem abrir a ficha.
+- `#interface` é flex: conteúdo com `max-content` dentro de `#ui-bottom` alarga `#ui-middle`.
+
 ## Fatos de dados confirmados em execução (E0-02)
 
 - Ator criado por `CONFIG.Actor.documentClass.create` (character ou mook) recebe 63 perícias

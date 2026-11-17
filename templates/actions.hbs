@@ -1,0 +1,24 @@
+<section class="ccp-actions">
+  {{#if hasSubject}}
+  {{#if actions.hasSkills}}
+  <button type="button" id="ccp-key-skills" class="ccp-key ccp-chamfer" data-action="toggleDrawer" data-drawer="skills" aria-expanded="{{#if (eq actions.open 'skills')}}true{{else}}false{{/if}}" aria-controls="ccp-drawer"><i class="fa-solid fa-list" aria-hidden="true"></i>{{localize "CCP.Drawer.Skills"}}</button>
+  {{/if}}
+  {{#if actions.hasRoles}}
+  <button type="button" id="ccp-key-roles" class="ccp-key ccp-chamfer" data-action="toggleDrawer" data-drawer="roles" aria-expanded="{{#if (eq actions.open 'roles')}}true{{else}}false{{/if}}" aria-controls="ccp-drawer"><i class="fa-solid fa-star" aria-hidden="true"></i>{{localize "CCP.Drawer.Roles"}}</button>
+  {{/if}}
+  {{#if actions.hasNet}}
+  <button type="button" id="ccp-key-net" class="ccp-key ccp-chamfer" data-action="toggleDrawer" data-drawer="net" aria-expanded="{{#if (eq actions.open 'net')}}true{{else}}false{{/if}}" aria-controls="ccp-drawer"><i class="fa-solid fa-network-wired" aria-hidden="true"></i>{{localize "CCP.Drawer.Net"}}</button>
+  {{/if}}
+  {{#if canEdit}}
+  <button type="button" id="ccp-key-facedown" class="ccp-key ccp-chamfer" data-action="rollFacedown" data-tooltip="{{localize 'CPR.characterSheet.bottomPane.fight.facedown'}}"><i class="fa-regular fa-face-angry" aria-hidden="true"></i>{{localize "CCP.Drawer.Facedown"}}</button>
+  {{/if}}
+  {{#if actions.favorites.length}}
+  <div class="ccp-favs" role="group" aria-label="{{localize 'CCP.Skills.Favorites'}}">
+    <span class="ccp-favs-tag">{{localize "CCP.Skills.Favorites"}}</span>
+    {{#each actions.favorites}}
+    <button type="button" id="ccp-fav-{{id}}" class="ccp-mini ccp-fav ccp-chamfer" data-action="rollSkill" data-skill-id="{{id}}" {{#unless ../canEdit}}disabled{{/unless}}>{{label}} <b>{{total}}</b></button>
+    {{/each}}
+  </div>
+  {{/if}}
+  {{/if}}
+</section>

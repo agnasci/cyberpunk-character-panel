@@ -17,6 +17,8 @@ const snap = (extra: Partial<CharacterSnapshot> = {}): CharacterSnapshot => ({
   humanity: { value: 32, max: 40 },
   luck: { value: 4, max: 6 },
   deathSave: { value: 1, penalty: 1, basePenalty: 0 },
+  armor: { head: { value: 11, max: 11 }, body: { value: 9, max: 11 }, shield: null },
+  stats: [{ key: "ref", value: 8, max: null }],
   canEdit: true,
   ...extra,
 });
@@ -104,5 +106,14 @@ describe("helpers", () => {
     expect(plainText("<p>Glass<b>wire</b></p><p>Two</p>")).toBe("Glasswire Two");
     expect(plainText("one<br>two")).toBe("one two");
     expect(plainText(null)).toBe("");
+  });
+});
+
+describe("armor", () => {
+  it("shows tracked armor and hides it when nothing is tracked", () => {
+    expect(buildPanelView(snap()).vitals.armor).toMatchObject({ head: { value: 11, max: 11 } });
+    expect(
+      buildPanelView(snap({ armor: { head: null, body: null, shield: null } })).vitals.armor,
+    ).toBeNull();
   });
 });

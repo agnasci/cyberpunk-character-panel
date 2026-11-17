@@ -1,0 +1,12 @@
+<section class="ccp-stats">
+  {{#if hasSubject}}
+  <div class="ccp-stat-grid">
+    {{#each stats}}
+    <button type="button" id="ccp-stat-{{key}}" class="ccp-stat ccp-chamfer" data-action="rollStat" data-stat="{{key}}" data-tooltip="{{localize tooltipKey}}" aria-label="{{localize labelKey}} {{value}}" {{#unless ../canEdit}}disabled{{/unless}}>
+      <span>{{localize labelKey}}</span>
+      <b>{{value}}{{#if max}}<small>/{{max}}</small>{{/if}}</b>
+    </button>
+    {{/each}}
+  </div>
+  {{/if}}
+</section>

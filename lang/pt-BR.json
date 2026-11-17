@@ -31,5 +31,18 @@
   "CCP.Vital.LuckRecover": "Recuperar 1 de LUCK",
   "CCP.Vital.DeathSave": "DEATH SAVE",
   "CCP.Settings.animateMonitor.Name": "Animar biomonitor",
-  "CCP.Settings.animateMonitor.Hint": "Anima o traço dos batimentos. Desligado, o traço fica parado. A preferência de reduzir movimento do sistema também o para."
+  "CCP.Settings.animateMonitor.Hint": "Anima o traço dos batimentos. Desligado, o traço fica parado. A preferência de reduzir movimento do sistema também o para.",
+  "CCP.Drawer.Skills": "Perícias",
+  "CCP.Drawer.Roles": "Roles",
+  "CCP.Drawer.Net": "NET",
+  "CCP.Drawer.Facedown": "Facedown",
+  "CCP.Skills.Favorites": "Favoritas",
+  "CCP.Skills.Favorite": "Favorita",
+  "CCP.Skills.Search": "Buscar perícia…",
+  "CCP.Skills.NoMatch": "Nenhuma perícia encontrada.",
+  "CCP.Net.NoRole": "nenhuma role de NET escolhida na ficha",
+  "CCP.Armor.Label": "SP da armadura",
+  "CCP.Armor.Head": "CAB",
+  "CCP.Armor.Body": "CORPO",
+  "CCP.Armor.Shield": "ESCUDO"
 }

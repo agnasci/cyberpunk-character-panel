@@ -60,16 +60,68 @@ export async function rollDeathSave(actor: Actor, modifiers: RollModifiers): Pro
   );
 }
 
-async function rollFromSheet(
+export function rollStat(actor: Actor, stat: string, modifiers: RollModifiers) {
+  return rollFromSheet(actor, { rollType: "stat", rollTitle: stat }, modifiers);
+}
+
+export function rollFacedown(actor: Actor, modifiers: RollModifiers) {
+  return rollFromSheet(
+    actor,
+    {
+      rollType: "facedown",
+      rollTitle: game.i18n.localize("CPR.characterSheet.bottomPane.fight.facedown"),
+    },
+    modifiers,
+  );
+}
+
+export function rollSkill(actor: Actor, skillId: string, modifiers: RollModifiers) {
+  const skill = (actor.itemTypes.skill ?? []).find((item) => item.id === skillId);
+  if (!skill) return Promise.resolve(false);
+  return rollFromSheet(
+    actor,
+    { rollType: "skill", rollTitle: skill.name, itemId: skill.id },
+    modifiers,
+  );
+}
+
+export function rollRoleAbility(
   actor: Actor,
-  dataset: Record<string, string>,
+  roleId: string,
+  subtype: string,
+  ability: string,
   modifiers: RollModifiers,
-): Promise<boolean> {
-  const sheet = actor.sheet as Partial<CprSheet> | null;
-  if (!editable(actor) || typeof sheet?._onRoll !== "function") return false;
+) {
+  if (!(actor.itemTypes.role ?? []).some((role) => role.id === roleId)) {
+    return Promise.resolve(false);
+  }
+  return rollFromSheet(
+    actor,
+    { rollType: "roleAbility", rollSubtype: subtype, rollTitle: ability, itemId: roleId },
+    modifiers,
+  );
+}
+
+export function rollInterface(
+  actor: Actor,
+  ability: string,
+  deckId: string,
+  modifiers: RollModifiers,
+) {
+  return rollFromSheet(
+    actor,
+    { rollType: "interfaceAbility", interfaceAbility: ability, cyberdeckId: deckId },
+    modifiers,
+  );
+}
+
+export function buildRollEvent(
+  dataset: Readonly<Record<string, string>>,
+  modifiers: RollModifiers,
+): Record<string, unknown> {
   const target = document.createElement("a");
   Object.assign(target.dataset, dataset);
-  await sheet._onRoll({
+  return {
     currentTarget: target,
     target,
     type: "click",
@@ -77,6 +129,16 @@ async function rollFromSheet(
     metaKey: modifiers.metaKey,
     preventDefault: () => undefined,
     stopPropagation: () => undefined,
-  });
+  };
+}
+
+async function rollFromSheet(
+  actor: Actor,
+  dataset: Record<string, string>,
+  modifiers: RollModifiers,
+): Promise<boolean> {
+  const sheet = actor.sheet as Partial<CprSheet> | null;
+  if (!editable(actor) || typeof sheet?._onRoll !== "function") return false;
+  await sheet._onRoll(buildRollEvent(dataset, modifiers));
   return true;
 }

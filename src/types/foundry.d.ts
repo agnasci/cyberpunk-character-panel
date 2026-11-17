@@ -8,6 +8,11 @@ declare class FoundryApplicationV2 {
   protected _prepareContext(options: Record<string, unknown>): Promise<Record<string, unknown>>;
   protected _onRender(context: Record<string, unknown>, options: Record<string, unknown>): void;
   protected _insertElement(element: HTMLElement): void;
+  protected _preparePartContext(
+    partId: string,
+    context: Record<string, unknown>,
+    options: Record<string, unknown>,
+  ): Promise<Record<string, unknown>>;
   protected _syncPartState(
     partId: string,
     newElement: HTMLElement,

@@ -35,12 +35,18 @@ Cada cliente lê o próprio ator e o dono grava nele (D05).
 | `PanelAction` | Nome + parâmetros mínimos (ids, chaves), nunca caminhos de dados |
 | `PanelPrefs` | Cor de destaque, escala, posição, seções visíveis, animação, seguir token |
 
-## Partes do ApplicationV2 (proposta)
+## Partes do ApplicationV2 (implementado até a E3)
 
-`identity`, `vitals` (biomonitor separado para não reiniciar a animação), `stats`,
-`quick` (botões), `favorites`, `drawer` (gaveta aberta), `slots` (conteúdo de outros
-módulos). Verificar `render({parts})` na E0-02; se não servir, separar o biomonitor
-em elemento próprio atualizado por atributos (`data-state`, variáveis CSS).
+Ordem no DOM: `drawer`, `identity`, `vitals`, `stats`, `dock`, `actions` (filhos diretos do
+`<aside>`; a grade CSS posiciona por `grid-area`). Mapa de mudanças em `src/domain/panel-parts.ts`.
+O nó `.ccp-monitor` é preservado em `_syncPartState` enquanto o estado vital não muda.
+`drawer` e `actions` montam o contexto em `_preparePartContext` (perícias, roles e NET só são
+lidos quando a parte é renderizada; a gaveta lê só o conteúdo aberto).
+
+Largura: `width: min(1040px, 100%)` com `contain: inline-size`, para o painel não empurrar a
+coluna central do Foundry; um `ResizeObserver` aplica `ccp-narrow` (< 880 px) e `ccp-tiny`
+(< 560 px), que reorganizam a grade. Recolhido volta a `fit-content`. A região `slots` (módulo
+de combate) entra na E6.
 
 ## API pública para o módulo de combate (E6)
 

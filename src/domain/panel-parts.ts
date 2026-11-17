@@ -1,32 +1,48 @@
-export type PanelPart = "identity" | "vitals" | "dock";
+export type PanelPart = "drawer" | "identity" | "vitals" | "stats" | "dock" | "actions";
 
-export const ALL_PARTS: readonly PanelPart[] = ["identity", "vitals", "dock"];
-
-const RULES: ReadonlyArray<[RegExp, PanelPart]> = [
-  [/^name$/, "identity"],
-  [/^img$/, "identity"],
-  [/^system\.information\./, "identity"],
-  [/^system\.roleInfo\./, "identity"],
-  [/^system\.derivedStats\./, "vitals"],
-  [/^system\.stats\.luck\./, "vitals"],
+export const ALL_PARTS: readonly PanelPart[] = [
+  "drawer",
+  "identity",
+  "vitals",
+  "stats",
+  "dock",
+  "actions",
 ];
 
-const ITEM_PARTS: Readonly<Record<string, PanelPart>> = {
-  role: "identity",
-  criticalInjury: "vitals",
+const RULES: ReadonlyArray<[RegExp, readonly PanelPart[]]> = [
+  [/^name$/, ["identity"]],
+  [/^img$/, ["identity"]],
+  [/^system\.information\./, ["identity"]],
+  [/^system\.roleInfo\./, ["identity", "drawer"]],
+  [/^system\.derivedStats\./, ["vitals"]],
+  [/^system\.externalData\./, ["vitals"]],
+  [/^system\.stats\.luck\./, ["vitals"]],
+  [/^system\.stats\./, ["stats", "drawer"]],
+];
+
+const ITEM_PARTS: Readonly<Record<string, readonly PanelPart[]>> = {
+  role: ["identity", "drawer", "actions"],
+  skill: ["drawer", "actions"],
+  cyberdeck: ["drawer", "actions"],
+  criticalInjury: ["vitals"],
+  armor: ["vitals"],
 };
 
+function ordered(parts: Iterable<PanelPart>): PanelPart[] {
+  const set = new Set(parts);
+  return ALL_PARTS.filter((p) => set.has(p));
+}
+
 export function partsForActorChange(changedKeys: readonly string[]): PanelPart[] {
-  const parts = new Set<PanelPart>();
+  const parts: PanelPart[] = [];
   for (const key of changedKeys) {
-    for (const [pattern, part] of RULES) if (pattern.test(key)) parts.add(part);
+    for (const [pattern, targets] of RULES) if (pattern.test(key)) parts.push(...targets);
   }
-  return ALL_PARTS.filter((p) => parts.has(p));
+  return ordered(parts);
 }
 
 export function partsForItemChange(itemType: string): PanelPart[] {
-  const part = ITEM_PARTS[itemType];
-  return part ? [part] : [];
+  return ordered(ITEM_PARTS[itemType] ?? []);
 }
 
 export function partsForTokenChange(changedKeys: readonly string[]): PanelPart[] {
@@ -34,5 +50,5 @@ export function partsForTokenChange(changedKeys: readonly string[]): PanelPart[]
 }
 
 export function partsForEffectChange(): PanelPart[] {
-  return ["vitals"];
+  return ordered(["vitals", "stats", "drawer"]);
 }

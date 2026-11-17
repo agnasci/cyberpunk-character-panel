@@ -58,6 +58,14 @@
       {{/if}}
     </span>
     {{/if}}
+    {{#if vitals.armor}}
+    <span class="ccp-mini ccp-armor ccp-chamfer" aria-label="{{localize 'CCP.Armor.Label'}}">
+      <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+      {{#if vitals.armor.head}}<span data-tooltip="{{localize 'CPR.itemSheet.armor.headArmorSp'}}">{{localize "CCP.Armor.Head"}} <b>{{vitals.armor.head.value}}<small>/{{vitals.armor.head.max}}</small></b></span>{{/if}}
+      {{#if vitals.armor.body}}<span data-tooltip="{{localize 'CPR.itemSheet.armor.bodyArmorSp'}}">{{localize "CCP.Armor.Body"}} <b>{{vitals.armor.body.value}}<small>/{{vitals.armor.body.max}}</small></b></span>{{/if}}
+      {{#if vitals.armor.shield}}<span data-tooltip="{{localize 'CPR.global.generic.shield'}}">{{localize "CCP.Armor.Shield"}} <b>{{vitals.armor.shield.value}}<small>/{{vitals.armor.shield.max}}</small></b></span>{{/if}}
+    </span>
+    {{/if}}
   </div>
   {{/if}}
 </section>
