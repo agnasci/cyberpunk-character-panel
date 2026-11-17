@@ -126,7 +126,7 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
   #queued = new Map<string, number>();
   #refocus: string | null = null;
   #drawer: DrawerId | null = null;
-  #skillQuery = "";
+  #queries = { skills: "", health: "" };
   #favScroll = 0;
   #preview: string | null = null;
   #resizer: ResizeObserver | null = null;
@@ -168,7 +168,7 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
     this.#resolved = resolved;
     if (changed) {
       this.#drawer = null;
-      this.#skillQuery = "";
+      this.#queries = { skills: "", health: "" };
       this.#favScroll = 0;
     }
     if (!this.#settings.enabled) return;
@@ -275,7 +275,7 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
     const vitals = context.vitals as { state?: string } | undefined;
     if (vitals?.state) this.element.dataset.vital = vitals.state;
     this.#applyRootState(context.hasSubject === true);
-    this.#bindSkillSearch();
+    this.#bindDrawerSearch();
     this.#bindFavorites();
     this.#bindStyleEditor();
     this.#observeWidth();
@@ -435,43 +435,42 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
     update();
   }
 
-  #bindSkillSearch(): void {
-    const input = this.element.querySelector<HTMLInputElement>("#ccp-skill-search");
-    if (!input || input.dataset.bound === "1") return;
+  #bindDrawerSearch(): void {
+    const input = this.element.querySelector<HTMLInputElement>(".ccp-drawer .ccp-search");
+    const key = input?.dataset.searchFor;
+    if (!input || (key !== "skills" && key !== "health") || input.dataset.bound === "1") return;
     input.dataset.bound = "1";
-    input.value = this.#skillQuery;
-    input.addEventListener("input", () => {
-      this.#skillQuery = input.value;
-      this.#applySkillFilter();
-    });
+    input.value = this.#queries[key];
+    const apply = (value: string) => {
+      this.#queries[key] = value;
+      this.#applyDrawerFilter(value);
+    };
+    input.addEventListener("input", () => apply(input.value));
     input.addEventListener("keydown", (event) => {
       event.stopPropagation();
       if (event.key === "Escape" && input.value) {
         event.preventDefault();
         input.value = "";
-        this.#skillQuery = "";
-        this.#applySkillFilter();
+        apply("");
       }
     });
-    this.#applySkillFilter();
+    this.#applyDrawerFilter(input.value);
   }
 
-  #applySkillFilter(): void {
+  #applyDrawerFilter(query: string): void {
     const drawer = this.element.querySelector<HTMLElement>(".ccp-drawer");
     if (!drawer) return;
     let shown = 0;
-    for (const group of drawer.querySelectorAll<HTMLElement>(".ccp-skill-group")) {
-      let groupShown = 0;
-      for (const row of group.querySelectorAll<HTMLElement>(".ccp-skill")) {
-        const visible = filterVisible(row.dataset.search ?? "", this.#skillQuery);
-        row.hidden = !visible;
-        if (visible) groupShown++;
-      }
-      group.hidden = groupShown === 0;
-      shown += groupShown;
+    for (const row of drawer.querySelectorAll<HTMLElement>("[data-search]")) {
+      const visible = filterVisible(row.dataset.search ?? "", query);
+      row.hidden = !visible;
+      if (visible) shown++;
     }
-    const empty = drawer.querySelector<HTMLElement>(".ccp-empty");
-    if (empty) empty.hidden = shown > 0;
+    for (const group of drawer.querySelectorAll<HTMLElement>("[data-search-group]")) {
+      group.hidden = query.trim() !== "" && !group.querySelector("[data-search]:not([hidden])");
+    }
+    const empty = drawer.querySelector<HTMLElement>(".ccp-no-match");
+    if (empty) empty.hidden = shown > 0 || query.trim() === "";
   }
 
   #place(element: HTMLElement): void {

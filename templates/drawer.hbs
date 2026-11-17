@@ -4,13 +4,13 @@
     <h2><i class="fa-solid fa-list-check" aria-hidden="true"></i>{{localize "CCP.Drawer.Skills"}}</h2>
     <label class="ccp-search-wrap">
       <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-      <input type="search" id="ccp-skill-search" class="ccp-search" placeholder="{{localize 'CCP.Skills.Search'}}" aria-label="{{localize 'CCP.Skills.Search'}}" autocomplete="off">
+      <input type="search" id="ccp-skill-search" class="ccp-search" data-search-for="skills" placeholder="{{localize 'CCP.Skills.Search'}}" aria-label="{{localize 'CCP.Skills.Search'}}" autocomplete="off">
     </label>
   </header>
   <div class="ccp-skill-cols">
     <div class="ccp-skill-flow">
     {{#each drawer.skills}}
-    <div class="ccp-skill-group" data-category="{{category}}">
+    <div class="ccp-skill-group" data-category="{{category}}" data-search-group>
       <h3>{{localize labelKey}}</h3>
       {{#each skills}}
       <div class="ccp-skill" data-search="{{search}}">
@@ -26,7 +26,7 @@
     {{/each}}
     </div>
   </div>
-  <p class="ccp-empty" hidden>{{localize "CCP.Skills.NoMatch"}}</p>
+  <p class="ccp-empty ccp-no-match" hidden>{{localize "CCP.Skills.NoMatch"}}</p>
   {{/if}}
   {{#if drawer.roles}}
   <header><h2><i class="fa-solid fa-id-badge" aria-hidden="true"></i>{{localize "CCP.Drawer.Roles"}}</h2></header>
@@ -85,6 +85,11 @@
   {{#if drawer.health}}
   <header>
     <h2><i class="fa-solid fa-kit-medical" aria-hidden="true"></i>{{localize "CCP.Drawer.Health"}}</h2>
+    <div class="ccp-head-tools">
+    <label class="ccp-search-wrap">
+      <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      <input type="search" id="ccp-health-search" class="ccp-search" data-search-for="health" placeholder="{{localize 'CCP.Health.Search'}}" aria-label="{{localize 'CCP.Health.Search'}}" autocomplete="off">
+    </label>
     {{#if @root.vitals.deathSave}}
     <div class="ccp-ds-panel{{#if @root.vitals.deathSaveShown}} ccp-alert{{/if}}" role="group" aria-label="{{localize 'CCP.Vital.DeathSave'}}">
       {{#if @root.canEdit}}
@@ -97,46 +102,56 @@
       {{/if}}
     </div>
     {{/if}}
+    </div>
   </header>
   <div class="ccp-health">
     <div class="ccp-health-col">
+      <div class="ccp-health-sec" data-search-group>
       <h3><i class="fa-solid fa-bone" aria-hidden="true"></i>{{localize "CCP.Health.Injuries"}}</h3>
       {{#each drawer.health.injuries}}
-      <button type="button" id="ccp-inj-{{id}}" class="ccp-row ccp-row-injury" data-action="openItem" data-item-type="criticalInjury" data-item-id="{{id}}">
+      <button type="button" id="ccp-inj-{{id}}" class="ccp-row ccp-row-injury" data-action="openItem" data-item-type="criticalInjury" data-item-id="{{id}}" data-search="{{search}}">
         <span>{{name}}</span>
         <small>{{localize locationKey}}{{#if deathSaveIncrease}} · <i class="fa-solid fa-skull" aria-hidden="true"></i> {{localize "CCP.Health.DeathSavePlus"}}{{/if}}</small>
       </button>
       {{else}}
       <p class="ccp-empty">{{localize "CCP.Health.NoInjuries"}}</p>
       {{/each}}
+      </div>
+      <div class="ccp-health-sec" data-search-group>
       <h3><i class="fa-solid fa-pills" aria-hidden="true"></i>{{localize "CCP.Health.Drugs"}}</h3>
       {{#each drawer.health.drugs}}
-      <div class="ccp-row ccp-row-static">
+      <div class="ccp-row ccp-row-static" data-search="{{search}}">
         <button type="button" id="ccp-drug-open-{{id}}" class="ccp-row-link" data-action="openItem" data-item-type="drug" data-item-id="{{id}}">{{name}} <small>×{{amount}}</small></button>
         {{#if @root.canEdit}}<button type="button" id="ccp-drug-use-{{id}}" class="ccp-step" data-action="useDrug" data-item-id="{{id}}" {{#unless usable}}disabled{{/unless}}><i class="fa-solid fa-syringe" aria-hidden="true"></i> {{localize "CPR.global.generic.snort"}}</button>{{/if}}
       </div>
       {{else}}
       <p class="ccp-empty">{{localize "CCP.Health.NoDrugs"}}</p>
       {{/each}}
+      </div>
     </div>
     <div class="ccp-health-col">
+      <div class="ccp-health-sec" data-search-group>
       <h3><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>{{localize "CCP.Health.Effects"}}</h3>
       {{#each drawer.health.effects}}
-      <div class="ccp-row ccp-row-static{{#if disabled}} ccp-off{{/if}}">
+      <div class="ccp-row ccp-row-static{{#if disabled}} ccp-off{{/if}}" data-search="{{search}}">
         <button type="button" id="ccp-eff-open-{{@index}}" class="ccp-row-link" data-action="openEffect" data-effect-uuid="{{uuid}}">{{#if img}}<img src="{{img}}" alt="">{{/if}}{{name}}{{#if source}} <small>{{source}}</small>{{/if}}</button>
         {{#if @root.canEdit}}<button type="button" id="ccp-eff-toggle-{{@index}}" class="ccp-switch" data-action="toggleEffect" data-effect-uuid="{{uuid}}" role="switch" aria-checked="{{#if disabled}}false{{else}}true{{/if}}" aria-label="{{localize 'CCP.Health.ToggleEffect'}}: {{name}}" data-tooltip="{{localize 'CCP.Health.ToggleEffect'}}"></button>{{/if}}
       </div>
       {{else}}
       <p class="ccp-empty">{{localize "CCP.Health.NoEffects"}}</p>
       {{/each}}
+      </div>
+      <div class="ccp-health-sec" data-search-group>
       <h3><i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i>{{localize "CCP.Health.Statuses"}}</h3>
       <div class="ccp-status-grid">
         {{#each drawer.health.statuses}}
-        <button type="button" id="ccp-status-{{id}}" class="ccp-status" data-action="toggleStatus" data-status-id="{{id}}" aria-pressed="{{#if active}}true{{else}}false{{/if}}" aria-label="{{name}}" data-tooltip="{{name}}" {{#unless @root.canEdit}}disabled{{/unless}}><img src="{{img}}" alt=""></button>
+        <button type="button" id="ccp-status-{{id}}" class="ccp-status" data-action="toggleStatus" data-status-id="{{id}}" data-search="{{search}}" aria-pressed="{{#if active}}true{{else}}false{{/if}}" aria-label="{{name}}" data-tooltip="{{name}}" {{#unless @root.canEdit}}disabled{{/unless}}><img src="{{img}}" alt=""></button>
         {{/each}}
+      </div>
       </div>
     </div>
   </div>
+  <p class="ccp-empty ccp-no-match" hidden>{{localize "CCP.Health.NoMatch"}}</p>
   {{/if}}
   {{#if drawer.style}}
   <header>

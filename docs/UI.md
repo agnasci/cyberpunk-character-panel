@@ -38,7 +38,7 @@ da E0-03 (2026-11-16) fica como referência histórica do biomonitor.
   coração pulsando no canto; fica ao lado dos chips (D34) e nasce sob a borda do anel, com grade em
   elipse e linha base na cor do estado (D35). O estado de ferimento é o primeiro chip.
 - Painel de instrumentos (D41): células SP, HUM (com barra), LUCK (losangos clicáveis, menores de 9 a 12;
-  número com −/+ acima de 12 ou acima do máximo, D42) e Death Save só quando importa (D30), como célula-botão de rolar; a penalidade
+  número com −/+ acima de 12 ou acima do máximo, D42) e Death Save só com ferimento mortal (D44), como célula-botão de rolar; a penalidade
   se ajusta na gaveta Saúde. O estado de ferimento é a legenda do ECG.
 - STATs: teclado 5×2 com barra de nível (valor/10) na base de cada tecla.
 - Abas: só ícone (dica no hover); a aberta fica com o ícone destacado na cor de destaque (D43). Facedown é aba de ação

@@ -13,7 +13,29 @@ Atualizado em: 2026-11-17.
   Sem página no site do Foundry ainda.
 - Repositório privado: <https://github.com/agnasci/cyberpunk-character-panel> (`main`); E4 em `2f31f4c`.
 
-## Última entrega: UI-R1 — redesenho da interface (2026-11-17)
+## Última entrega: FIX-01 — Death Save e busca na Saúde (2026-11-17)
+
+Objetivo: célula de Death Save só com ferimento mortal (D44) e busca por texto na gaveta Saúde
+(D45). Aceite: célula some com HP laranja e com penalidade > 0 fora do ferimento mortal; busca
+filtra lesões, drogas, efeitos e status do token pelo nome, sem acento/caixa; `npm run check` passa.
+
+Arquivos: `src/domain/view-model.ts`, `src/domain/panel-views.ts`, `src/ui/character-panel-app.ts`
+(busca genérica por `data-search-for` / `data-search` / `data-search-group`), `templates/drawer.hbs`,
+`styles/character-panel.css`, `lang/*.json`, testes de view-model e panel-views, docs.
+
+Validação:
+- `npm run check` exit 0 (92 testes).
+- Manual real (Foundry 12.343, mundo Cyberdeck HUD, jogador Runner Teste, viewport 1024 px): com
+  `basePenalty` 1, HP 40 e 15 (laranja) sem célula de Death Save; HP 1 sem célula e sem alerta; HP 0
+  (mortal) com célula vermelha e alerta no cabeçalho da Saúde. Busca na Saúde: "SHIELD" deixa 4
+  status e esconde as outras seções; "lesao" acha "CCP Teste Lesão"; "xyz" mostra o aviso; Esc
+  volta aos 38 itens; com "bl" digitado, atualizar o HP manteve foco, texto e filtro; a busca
+  continua lá ao trocar de gaveta e voltar. Perícias: "PERCEP" deixa 2 em 2 grupos; "qqq" mostra o
+  aviso; Esc volta às 63. Estado restaurado (HP 40, gaveta fechada).
+- Não testado: largura cheia (cabeçalho da Saúde com busca e Death Save lado a lado), busca pela
+  origem de um efeito no Foundry (só no teste unitário), mestre.
+
+## Entrega anterior: UI-R1 — redesenho da interface (2026-11-17)
 
 Objetivo: menos espaço vazio e menos informação fixa, visual mais detalhado e distante da barra
 do cpr-combat-hud, mantendo todas as funções da E1–E5. Aceite: todas as ações continuam

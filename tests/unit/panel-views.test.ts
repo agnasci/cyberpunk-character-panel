@@ -75,6 +75,19 @@ describe("panel views", () => {
     );
   });
 
+  it("adds search keys to health entries", () => {
+    const health = buildDrawerView("health", {
+      injuries: [{ id: "i1", name: "Braço Quebrado", location: "body", deathSaveIncrease: false }],
+      drugs: [{ id: "d1", name: "Blue Glass", img: "", amount: 1 }],
+      effects: [{ uuid: "e1", name: "Atordoado", img: "", source: "Flashbang", disabled: false }],
+      statuses: [{ id: "prone", name: "Caído", img: "", active: false }],
+    }).health;
+    expect(health?.injuries[0]?.search).toBe("braco quebrado");
+    expect(health?.drugs[0]?.search).toBe("blue glass");
+    expect(health?.effects[0]?.search).toBe("atordoado flashbang");
+    expect(health?.statuses[0]?.search).toBe("caido");
+  });
+
   it("filters search text", () => {
     expect(filterVisible("percepcao", "PERC")).toBe(true);
     expect(filterVisible("percepcao", "stealth")).toBe(false);

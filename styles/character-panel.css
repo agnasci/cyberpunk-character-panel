@@ -1632,8 +1632,21 @@
   gap: 3px;
 }
 
-.ccp-panel .ccp-health-col h3:not(:first-child) {
+.ccp-panel .ccp-health-sec {
+  display: grid;
+  align-content: start;
+  gap: 3px;
+}
+
+.ccp-panel .ccp-health-sec:not([hidden]) ~ .ccp-health-sec {
   margin-top: 8px;
+}
+
+.ccp-panel .ccp-head-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
 }
 
 .ccp-panel .ccp-row {

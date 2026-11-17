@@ -39,7 +39,7 @@ Fontes de dados verificadas no código do sistema em docs/COMPATIBILITY.md. Iten
 | NET | Habilidades de Interface se houver cyberdeck equipado e role de Netrunning | Rolar; abrir o cyberdeck do Netrunner HUD se ele estiver ativo |
 | Facedown | — | Rolar Facedown |
 | Ficha rápida | Eurobucks, IP, Reputação (ledger do sistema) | Somar/subtrair com motivo, registrado no ledger nativo |
-| Saúde | Lesões críticas atuais, condições/status do token, efeitos ativos | Abrir item; alternar status; ligar/desligar mods situacionais (confirmar) |
+| Saúde | Lesões críticas atuais, condições/status do token, efeitos ativos, busca por texto | Abrir item; alternar status; ligar/desligar mods situacionais (confirmar) |
 | Consumíveis | Drogas carregadas | Usar (ação `snort` do sistema, com a confirmação dele) |
 | Personalização | Cor de destaque, escala, posição, seções visíveis, animações | Tudo por usuário; padrão de mundo opcional do mestre |
 

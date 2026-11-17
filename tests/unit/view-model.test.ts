@@ -163,14 +163,16 @@ describe("vital readouts", () => {
     expect(buildPanelView(snap()).vitals.luck?.pips).toHaveLength(6);
   });
 
-  it("shows the Death Save chip only when it matters", () => {
+  it("shows the Death Save chip only while mortally wounded", () => {
     const calm = { value: 0, penalty: 0, basePenalty: 0 };
     expect(deathSaveShown("notWounded", calm)).toBe(false);
     expect(deathSaveShown("lightlyWounded", calm)).toBe(false);
-    expect(deathSaveShown("seriouslyWounded", calm)).toBe(true);
+    expect(deathSaveShown("seriouslyWounded", calm)).toBe(false);
+    expect(deathSaveShown("seriouslyWounded", { value: 2, penalty: 1, basePenalty: 1 })).toBe(
+      false,
+    );
     expect(deathSaveShown("mortallyWounded", calm)).toBe(true);
-    expect(deathSaveShown("notWounded", { ...calm, penalty: 1 })).toBe(true);
-    expect(deathSaveShown("notWounded", { ...calm, basePenalty: 1 })).toBe(true);
+    expect(deathSaveShown("dead", calm)).toBe(false);
     expect(deathSaveShown("mortallyWounded", null)).toBe(false);
   });
 });

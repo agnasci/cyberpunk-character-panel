@@ -66,6 +66,8 @@
   "CCP.Health.NoEffects": "Nenhum efeito ativo.",
   "CCP.Health.ToggleEffect": "Ligar ou desligar efeito",
   "CCP.Health.Statuses": "Status do token",
+  "CCP.Health.Search": "Buscar condição…",
+  "CCP.Health.NoMatch": "Nenhuma condição encontrada.",
   "CCP.Style.Open": "Aparência",
   "CCP.Style.Title": "Aparência",
   "CCP.Style.Personal": "Cor de destaque pessoal",

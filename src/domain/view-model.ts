@@ -56,8 +56,6 @@ const STATE_LABELS: Record<VitalState, string> = {
 export const HP_ARC = 75;
 export const MAX_LUCK_PIPS = 12;
 
-const DEATH_SAVE_STATES: ReadonlySet<VitalState> = new Set(["seriouslyWounded", "mortallyWounded"]);
-
 export function hpPercent(value: number, max: number): number {
   if (max <= 0) return 0;
   return Math.round((Math.min(Math.max(value, 0), max) / max) * 100);
@@ -76,8 +74,7 @@ export function luckPips(luck: Pool): LuckPip[] | null {
 }
 
 export function deathSaveShown(state: VitalState, deathSave: DeathSaveSnapshot | null): boolean {
-  if (!deathSave) return false;
-  return DEATH_SAVE_STATES.has(state) || deathSave.penalty > 0 || deathSave.basePenalty > 0;
+  return deathSave !== null && state === "mortallyWounded";
 }
 
 function hpView(hp: Pool): PoolView {

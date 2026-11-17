@@ -66,6 +66,8 @@
   "CCP.Health.NoEffects": "No active effects.",
   "CCP.Health.ToggleEffect": "Turn effect on or off",
   "CCP.Health.Statuses": "Token status",
+  "CCP.Health.Search": "Search conditions…",
+  "CCP.Health.NoMatch": "No condition matches the search.",
   "CCP.Style.Open": "Appearance",
   "CCP.Style.Title": "Appearance",
   "CCP.Style.Personal": "Personal accent color",

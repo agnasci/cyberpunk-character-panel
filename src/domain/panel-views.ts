@@ -22,11 +22,13 @@ import {
 
 export type DrawerId = "skills" | "roles" | "net" | "sheet" | "health" | "style";
 
+type Searchable<T> = T & { search: string };
+
 export interface HealthView {
-  injuries: (InjuryEntry & { locationKey: string })[];
-  drugs: (DrugEntry & { usable: boolean })[];
-  effects: EffectEntry[];
-  statuses: StatusEntry[];
+  injuries: Searchable<InjuryEntry & { locationKey: string }>[];
+  drugs: Searchable<DrugEntry & { usable: boolean }>[];
+  effects: Searchable<EffectEntry>[];
+  statuses: Searchable<StatusEntry>[];
 }
 
 export const INTERFACE_ABILITIES = [
@@ -140,10 +142,18 @@ export function buildDrawerView(
           injuries: (source.injuries ?? []).map((i) => ({
             ...i,
             locationKey: injuryLocationKey(i.location),
+            search: searchKey(i.name),
           })),
-          drugs: (source.drugs ?? []).map((d) => ({ ...d, usable: d.amount > 0 })),
-          effects: [...(source.effects ?? [])],
-          statuses: [...(source.statuses ?? [])],
+          drugs: (source.drugs ?? []).map((d) => ({
+            ...d,
+            usable: d.amount > 0,
+            search: searchKey(d.name),
+          })),
+          effects: (source.effects ?? []).map((e) => ({
+            ...e,
+            search: searchKey(`${e.name} ${e.source ?? ""}`),
+          })),
+          statuses: (source.statuses ?? []).map((s) => ({ ...s, search: searchKey(s.name) })),
         }
       : null;
   const style = open === "style" ? (source.style ?? null) : null;
