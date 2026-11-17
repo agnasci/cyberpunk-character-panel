@@ -10,6 +10,7 @@ export const SETTINGS = {
   scale: "scale",
   dock: "dock",
   collapsed: "collapsed",
+  animateMonitor: "animateMonitor",
 } as const;
 
 export const KEYBINDING_TOGGLE = "togglePanel";

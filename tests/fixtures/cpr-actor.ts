@@ -8,6 +8,9 @@ interface FixtureOptions {
   roles?: Array<{ name: string; rank: number }>;
   statuses?: string[];
   isOwner?: boolean;
+  humanity?: { value: number; max: number };
+  luck?: { value: number; max: number };
+  deathSave?: { value: number; penalty: number; basePenalty: number } | null;
 }
 
 export function fakeActor(options: FixtureOptions = {}): Actor {
@@ -18,6 +21,10 @@ export function fakeActor(options: FixtureOptions = {}): Actor {
     system: { rank: r.rank },
     parent: null,
   }));
+  const deathSave =
+    options.deathSave === null
+      ? {}
+      : { deathSave: options.deathSave ?? { value: 0, penalty: 0, basePenalty: 0 } };
   return {
     id: "a1",
     uuid: "Actor.a1",
@@ -29,11 +36,15 @@ export function fakeActor(options: FixtureOptions = {}): Actor {
     statuses: new Set(options.statuses ?? []),
     itemTypes: { role: roles },
     sheet: null,
+    update: () => Promise.resolve(undefined),
     system: {
       information: { alias: options.alias ?? "" },
       roleInfo: { activeRole: options.activeRole ?? roles[0]?.name ?? "", activeNetRole: "" },
+      stats: { luck: options.luck ?? { value: 4, max: 6 } },
       derivedStats: {
         currentWoundState: options.woundState ?? "notWounded",
+        humanity: options.humanity ?? { value: 32, max: 40 },
+        ...deathSave,
         ...(options.hp === null ? {} : { hp: options.hp ?? { value: 35, max: 35 } }),
       },
     },

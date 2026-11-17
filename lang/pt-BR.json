@@ -18,5 +18,18 @@
   "CCP.Settings.dock.Bottom": "Embaixo",
   "CCP.Settings.dock.Top": "Em cima",
   "CCP.Keybinding.Toggle.Name": "Recolher ou expandir o painel de personagem",
-  "CCP.Keybinding.Toggle.Hint": "Recolhe o painel numa barra fina ou o expande de novo."
+  "CCP.Keybinding.Toggle.Hint": "Recolhe o painel numa barra fina ou o expande de novo.",
+  "CCP.Vital.Biomonitor": "Biomonitor",
+  "CCP.Vital.Bpm": "BPM",
+  "CCP.Vital.NoPulse": "Sem pulso",
+  "CCP.Vital.NoSignal": "Sem sinal",
+  "CCP.Vital.HpDown": "Perder {n} HP",
+  "CCP.Vital.HpUp": "Recuperar {n} HP",
+  "CCP.Vital.HpEdit": "Digite um valor (12) ou uma variação (-5, +3)",
+  "CCP.Vital.Humanity": "HUM",
+  "CCP.Vital.LuckSpend": "Gastar 1 de LUCK",
+  "CCP.Vital.LuckRecover": "Recuperar 1 de LUCK",
+  "CCP.Vital.DeathSave": "DEATH SAVE",
+  "CCP.Settings.animateMonitor.Name": "Animar biomonitor",
+  "CCP.Settings.animateMonitor.Hint": "Anima o traço dos batimentos. Desligado, o traço fica parado. A preferência de reduzir movimento do sistema também o para."
 }

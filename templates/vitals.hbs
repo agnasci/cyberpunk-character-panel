@@ -1,16 +1,62 @@
 <section class="ccp-vitals">
   {{#if hasSubject}}
-  <div class="ccp-wound">{{localize vitals.stateLabelKey}}</div>
+  <div class="ccp-monitor" data-state="{{vitals.monitor.state}}" style="--ccp-period: {{vitals.monitor.periodSeconds}}s" role="img" aria-label="{{localize 'CCP.Vital.Biomonitor'}}: {{localize vitals.stateLabelKey}}">
+    <svg viewBox="0 0 240 48" preserveAspectRatio="none" aria-hidden="true">
+      <path class="ccp-ecg-base" d="{{vitals.monitor.path}}"></path>
+      {{#unless vitals.monitor.flatline}}
+      <path class="ccp-ecg-tail" pathLength="100" d="{{vitals.monitor.path}}"></path>
+      <path class="ccp-ecg-head" pathLength="100" d="{{vitals.monitor.path}}"></path>
+      {{/unless}}
+    </svg>
+    <span class="ccp-bpm" aria-hidden="true">{{#if vitals.monitor.bpm}}{{vitals.monitor.bpm}} <small>{{localize "CCP.Vital.Bpm"}}</small>{{else}}— <small>{{localize vitals.monitor.flatLabelKey}}</small>{{/if}}</span>
+    <span class="ccp-wound">{{localize vitals.stateLabelKey}}</span>
+  </div>
   <div class="ccp-hp-row">
     <span class="ccp-hp-label">{{localize "CCP.Vital.HP"}}</span>
     {{#if vitals.hp}}
     <div class="ccp-hp-bar" role="meter" aria-label="{{localize 'CCP.Vital.HP'}}" aria-valuemin="0" aria-valuemax="{{vitals.hp.max}}" aria-valuenow="{{vitals.hp.value}}">
       <div class="ccp-hp-fill" style="width: {{vitals.hp.percent}}%"></div>
     </div>
+    {{#if canEdit}}
+    <button type="button" id="ccp-hp-value" class="ccp-hp-value ccp-hp-edit" data-action="editHp" data-tooltip="{{localize 'CCP.Vital.HpEdit'}}" aria-label="{{localize 'CCP.Vital.HP'}} {{vitals.hp.value}}/{{vitals.hp.max}}. {{localize 'CCP.Vital.HpEdit'}}">{{vitals.hp.value}}<small>/{{vitals.hp.max}}</small></button>
+    {{else}}
     <span class="ccp-hp-value">{{vitals.hp.value}}<small>/{{vitals.hp.max}}</small></span>
+    {{/if}}
     {{else}}
     <div class="ccp-hp-bar"></div>
     <span class="ccp-hp-value">—</span>
+    {{/if}}
+  </div>
+  {{#if canEdit}}{{#if vitals.hp}}
+  <div class="ccp-hp-tools">
+    <button type="button" id="ccp-hp-m5" class="ccp-step ccp-chamfer" data-action="stepHp" data-delta="-5" aria-label="{{localize 'CCP.Vital.HpDown' n=5}}">−5</button>
+    <button type="button" id="ccp-hp-m1" class="ccp-step ccp-chamfer" data-action="stepHp" data-delta="-1" aria-label="{{localize 'CCP.Vital.HpDown' n=1}}">−1</button>
+    <button type="button" id="ccp-hp-p1" class="ccp-step ccp-chamfer" data-action="stepHp" data-delta="1" aria-label="{{localize 'CCP.Vital.HpUp' n=1}}">+1</button>
+    <button type="button" id="ccp-hp-p5" class="ccp-step ccp-chamfer" data-action="stepHp" data-delta="5" aria-label="{{localize 'CCP.Vital.HpUp' n=5}}">+5</button>
+  </div>
+  {{/if}}{{/if}}
+  <div class="ccp-minis">
+    {{#if vitals.humanity}}
+    <span class="ccp-mini ccp-chamfer" data-tooltip="{{localize 'CPR.characterSheet.leftPane.humanity'}}">{{localize "CCP.Vital.Humanity"}} <b>{{vitals.humanity.value}}<small>/{{vitals.humanity.max}}</small></b></span>
+    {{/if}}
+    {{#if vitals.luck}}
+    <span class="ccp-mini ccp-chamfer" data-tooltip="{{localize 'CPR.global.stats.luckToolTip'}}">
+      {{#if canEdit}}<button type="button" id="ccp-luck-m" class="ccp-mini-btn" data-action="adjustLuck" data-delta="-1" aria-label="{{localize 'CCP.Vital.LuckSpend'}}" data-tooltip="{{localize 'CCP.Vital.LuckSpend'}}" {{#unless vitals.luck.canSpend}}disabled{{/unless}}><i class="fa-solid fa-minus" aria-hidden="true"></i></button>{{/if}}
+      {{localize "CPR.global.stats.luck"}} <b>{{vitals.luck.value}}<small>/{{vitals.luck.max}}</small></b>
+      {{#if canEdit}}<button type="button" id="ccp-luck-p" class="ccp-mini-btn" data-action="adjustLuck" data-delta="1" aria-label="{{localize 'CCP.Vital.LuckRecover'}}" data-tooltip="{{localize 'CCP.Vital.LuckRecover'}}" {{#unless vitals.luck.canRecover}}disabled{{/unless}}><i class="fa-solid fa-plus" aria-hidden="true"></i></button>{{/if}}
+    </span>
+    {{/if}}
+    {{#if vitals.deathSave}}
+    <span class="ccp-mini ccp-chamfer{{#if vitals.deathSave.value}} ccp-alert{{/if}}">
+      {{#if canEdit}}
+      <button type="button" id="ccp-ds-roll" class="ccp-mini-roll" data-action="rollDeathSave" aria-label="{{localize 'CPR.characterSheet.leftPane.deathSave.roll'}}" data-tooltip="{{localize 'CPR.characterSheet.leftPane.deathSave.roll'}}"><i class="fa-solid fa-dice-d10" aria-hidden="true"></i> {{localize "CCP.Vital.DeathSave"}}</button>
+      {{else}}{{localize "CCP.Vital.DeathSave"}}{{/if}}
+      <b data-tooltip="{{localize 'CPR.global.generic.deathPenalty'}}: {{vitals.deathSave.penalty}}<br>{{localize 'CPR.characterSheet.leftPane.deathSave.hoverCriticalInjuryPenalty'}}: {{vitals.deathSave.basePenalty}}">{{vitals.deathSave.value}}</b>
+      {{#if canEdit}}
+      <button type="button" id="ccp-ds-up" class="ccp-mini-btn" data-action="increaseDeathPenalty" aria-label="{{localize 'CPR.characterSheet.leftPane.deathSave.increase'}}" data-tooltip="{{localize 'CPR.characterSheet.leftPane.deathSave.increase'}}"><i class="fa-regular fa-circle-up" aria-hidden="true"></i></button>
+      <button type="button" id="ccp-ds-reset" class="ccp-mini-btn" data-action="resetDeathPenalty" aria-label="{{localize 'CPR.characterSheet.leftPane.deathSave.reset'}}" data-tooltip="{{localize 'CPR.characterSheet.leftPane.deathSave.reset'}}" {{#unless vitals.deathSave.penalty}}disabled{{/unless}}><i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i></button>
+      {{/if}}
+    </span>
     {{/if}}
   </div>
   {{/if}}

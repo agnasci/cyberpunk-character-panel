@@ -1,4 +1,5 @@
-import type { CharacterSnapshot } from "./character";
+import { buildMonitor, type MonitorView } from "./biomonitor";
+import type { CharacterSnapshot, DeathSaveSnapshot, Pool } from "./character";
 import { plainText } from "./plain-text";
 import { type VitalState, vitalState } from "./vital-state";
 
@@ -9,10 +10,18 @@ export interface IdentityView {
   role: { name: string; rank: number } | null;
 }
 
+export interface PoolView extends Pool {
+  percent: number;
+}
+
 export interface VitalsView {
   state: VitalState;
   stateLabelKey: string;
-  hp: { value: number; max: number; percent: number } | null;
+  monitor: MonitorView;
+  hp: PoolView | null;
+  humanity: Pool | null;
+  luck: (Pool & { canSpend: boolean; canRecover: boolean }) | null;
+  deathSave: DeathSaveSnapshot | null;
 }
 
 export interface PanelView {
@@ -37,6 +46,7 @@ export function hpPercent(value: number, max: number): number {
 
 export function buildPanelView(snapshot: CharacterSnapshot): PanelView {
   const state = vitalState(snapshot.woundState, snapshot.dead);
+  const luck = snapshot.luck;
   return {
     identity: {
       name: snapshot.name,
@@ -47,9 +57,13 @@ export function buildPanelView(snapshot: CharacterSnapshot): PanelView {
     vitals: {
       state,
       stateLabelKey: STATE_LABELS[state],
+      monitor: buildMonitor(state),
       hp: snapshot.hp
         ? { ...snapshot.hp, percent: hpPercent(snapshot.hp.value, snapshot.hp.max) }
         : null,
+      humanity: snapshot.actorType === "character" ? snapshot.humanity : null,
+      luck: luck ? { ...luck, canSpend: luck.value > 0, canRecover: luck.value < luck.max } : null,
+      deathSave: snapshot.deathSave,
     },
     canEdit: snapshot.canEdit,
   };

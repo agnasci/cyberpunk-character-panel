@@ -64,6 +64,7 @@ Hooks.once("ready", () => {
     if (user.id === game.user.id && "character" in changes) refreshSubject();
   });
   Hooks.on("updateActor", (actor, changes) => {
+    if ("ownership" in changes) refreshSubject();
     if (app?.isSubjectActor(actor)) app.markDirty(partsForActorChange(changedKeys(changes)));
   });
   Hooks.on("updateToken", (token, changes) => {

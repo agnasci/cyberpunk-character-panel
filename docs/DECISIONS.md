@@ -21,6 +21,9 @@ Estados: **Confirmada** (pelo usuário), **Proposta** (aguarda revisão), **Subs
 | D15 | Proposta | Atalho padrão Alt+C (C de character) para recolher, reconfigurável | Não colide com o `H` do cpr-combat-hud; testado na E1 |
 | D16 | Proposta | Recolhido = barra fina com nome e HP (sem retrato, alias, role, estado); estado salvo no cliente | Implementado na E1; ajustar com o usuário |
 | D12 | Proposta | API pública versionada (`api.version = 1`) com slots e hooks para o módulo de combate | Pedido de integração futura sem acoplamento |
+| D17 | Proposta | HP: botões ±1/±5 e campo direto que aceita valor (12) ou variação (-5, +3), sempre limitado a 0..máx; LUCK com botões −/+ limitados a 0..máx (no lugar do clique direito do protótipo); Death Save rola pela ficha e aumenta/zera pelos métodos do sistema | O sistema já corta HP acima do máx. ao preparar os dados; botões visíveis são acessíveis por teclado |
+| D18 | Proposta | Humanity aparece só para `character`, igual às fichas nativas (a ficha de mook não mostra) e só leitura | Perda de Humanity por cyberware é fluxo da ficha |
+| D19 | Proposta | Ajuste de cliente "Animar biomonitor" (padrão ligado); aba oculta e `prefers-reduced-motion` também param o traço | Critério E2-03 e acessibilidade |
 
 ## Formato de nova decisão
 

@@ -103,6 +103,22 @@ foi testado em execução no Netrunner HUD, não nesta etapa.
 - Ajustes de cliente com `name`/`hint` localizados aparecem na configuração em pt-BR.
 - `scene.view()` de cena criada por API só funciona para jogador com permissão na cena.
 
+## Fatos confirmados na E2 (testado em execução em 2026-11-16)
+
+- `prepareDerivedData` do sistema corta `hp.value` ao máximo; HP e penalidade de Death Save têm
+  mínimo 0 no schema. `deathSave.value = penalty + basePenalty` (basePenalty vem de lesões críticas).
+- Death Save pelo painel: `sheet._onRoll` com `data-roll-type="deathsave"` e `type: "click"` abre o
+  diálogo nativo; com Ctrl gera o card direto, autor = jogador dono. Falha não soma penalidade
+  (`processDeathSave`).
+- `actor.increaseDeathPenalty()` / `resetDeathPenalty()` chamados pelo painel funcionam para o dono.
+- Token não vinculado: HP/LUCK/penalidade gravados pelo painel vão para o ator sintético; o ator base
+  não muda.
+- Mudar `ownership` dispara `updateActor` com a chave `ownership` no cliente do jogador.
+- `HandlebarsApplicationMixin._syncPartState(partId, novo, anterior, estado)` existe na V12 e roda
+  depois de trocar o nó da parte; o foco é restaurado só para elemento com `id` ou `name`.
+- Com o painel do app oculto, a página não tem foco (`blur` programático não dispara) e transições
+  CSS não avançam; conferir esses pontos com o painel visível.
+
 ## Fatos de dados confirmados em execução (E0-02)
 
 - Ator criado por `CONFIG.Actor.documentClass.create` (character ou mook) recebe 63 perícias

@@ -8,6 +8,7 @@ export interface PanelSettings {
   scale: number;
   dock: DockPosition;
   collapsed: boolean;
+  animateMonitor: boolean;
 }
 
 export function registerSettings(onChange: () => void, onToggle: () => void): void {
@@ -35,6 +36,7 @@ export function registerSettings(onChange: () => void, onToggle: () => void): vo
     },
     default: "bottom",
   });
+  client(SETTINGS.animateMonitor, { type: Boolean, default: true });
   game.settings.register(MODULE_ID, SETTINGS.collapsed, {
     scope: "client",
     config: false,
@@ -62,6 +64,7 @@ export function readSettings(): PanelSettings {
     scale: Number.isFinite(scale) ? scale : 1,
     dock: get(SETTINGS.dock) === "top" ? "top" : "bottom",
     collapsed: get(SETTINGS.collapsed) === true,
+    animateMonitor: get(SETTINGS.animateMonitor) !== false,
   };
 }
 

@@ -8,6 +8,12 @@ declare class FoundryApplicationV2 {
   protected _prepareContext(options: Record<string, unknown>): Promise<Record<string, unknown>>;
   protected _onRender(context: Record<string, unknown>, options: Record<string, unknown>): void;
   protected _insertElement(element: HTMLElement): void;
+  protected _syncPartState(
+    partId: string,
+    newElement: HTMLElement,
+    priorElement: HTMLElement,
+    state: Record<string, unknown>,
+  ): void;
 }
 
 type FoundryApplicationClass = abstract new (
@@ -34,6 +40,7 @@ interface FoundryActor {
   readonly statuses: Set<string>;
   readonly itemTypes: Record<string, FoundryItem[] | undefined>;
   readonly sheet: { render(force: boolean): unknown } | null;
+  update(data: Record<string, unknown>): Promise<unknown>;
 }
 
 interface FoundryTokenDocument {

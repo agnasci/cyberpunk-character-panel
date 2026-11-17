@@ -1,6 +1,7 @@
 # Design da interface
 
-Status: protótipo da E0-03 publicado, aguardando aprovação do usuário. Nada aqui está aprovado ainda.
+Status: protótipo da E0-03 aprovado pelo usuário em 2026-11-16. Identidade, vital e biomonitor implementados na E1/E2;
+o restante é proposta até a etapa correspondente.
 
 ## Princípios
 
@@ -97,6 +98,10 @@ Referência visual: protótipo E0-03 em `prototype/panel.html`
 - Pausa quando o painel está recolhido/oculto, a aba está em segundo plano, o usuário
   desligou animações ou o sistema pede `prefers-reduced-motion` (fica a onda estática).
 - Só CSS animando atributos do SVG: sem `requestAnimationFrame` contínuo.
+- Implementado (E2-03): forma da onda gerada no domínio (`src/domain/biomonitor.ts`); o nó do
+  monitor é mantido entre renders enquanto o estado não muda, então mudar HP dentro do mesmo
+  estado não reinicia o traço. Ajuste de cliente "Animar biomonitor" deixa o traço parado.
+  Recolhido esconde o monitor (D16).
 
 ## Acessibilidade
 

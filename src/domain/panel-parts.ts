@@ -8,7 +8,13 @@ const RULES: ReadonlyArray<[RegExp, PanelPart]> = [
   [/^system\.information\./, "identity"],
   [/^system\.roleInfo\./, "identity"],
   [/^system\.derivedStats\./, "vitals"],
+  [/^system\.stats\.luck\./, "vitals"],
 ];
+
+const ITEM_PARTS: Readonly<Record<string, PanelPart>> = {
+  role: "identity",
+  criticalInjury: "vitals",
+};
 
 export function partsForActorChange(changedKeys: readonly string[]): PanelPart[] {
   const parts = new Set<PanelPart>();
@@ -19,7 +25,8 @@ export function partsForActorChange(changedKeys: readonly string[]): PanelPart[]
 }
 
 export function partsForItemChange(itemType: string): PanelPart[] {
-  return itemType === "role" ? ["identity"] : [];
+  const part = ITEM_PARTS[itemType];
+  return part ? [part] : [];
 }
 
 export function partsForTokenChange(changedKeys: readonly string[]): PanelPart[] {

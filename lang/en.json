@@ -18,5 +18,18 @@
   "CCP.Settings.dock.Bottom": "Bottom",
   "CCP.Settings.dock.Top": "Top",
   "CCP.Keybinding.Toggle.Name": "Collapse or expand character panel",
-  "CCP.Keybinding.Toggle.Hint": "Collapse the character panel to a slim bar, or expand it again."
+  "CCP.Keybinding.Toggle.Hint": "Collapse the character panel to a slim bar, or expand it again.",
+  "CCP.Vital.Biomonitor": "Biomonitor",
+  "CCP.Vital.Bpm": "BPM",
+  "CCP.Vital.NoPulse": "No pulse",
+  "CCP.Vital.NoSignal": "No signal",
+  "CCP.Vital.HpDown": "Lose {n} HP",
+  "CCP.Vital.HpUp": "Recover {n} HP",
+  "CCP.Vital.HpEdit": "Type a value (12) or a change (-5, +3)",
+  "CCP.Vital.Humanity": "HUM",
+  "CCP.Vital.LuckSpend": "Spend 1 LUCK",
+  "CCP.Vital.LuckRecover": "Recover 1 LUCK",
+  "CCP.Vital.DeathSave": "DEATH SAVE",
+  "CCP.Settings.animateMonitor.Name": "Animate biomonitor",
+  "CCP.Settings.animateMonitor.Hint": "Animate the heartbeat trace. When off, the trace stays still. The system reduced-motion preference also stops it."
 }

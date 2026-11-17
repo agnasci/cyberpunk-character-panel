@@ -14,6 +14,9 @@ const snap = (extra: Partial<CharacterSnapshot> = {}): CharacterSnapshot => ({
   hp: { value: 35, max: 35 },
   woundState: "notWounded",
   dead: false,
+  humanity: { value: 32, max: 40 },
+  luck: { value: 4, max: 6 },
+  deathSave: { value: 1, penalty: 1, basePenalty: 0 },
   canEdit: true,
   ...extra,
 });
@@ -46,26 +49,45 @@ describe("buildPanelView", () => {
     });
   });
 
-  it("builds vitals with percent and the system label key", () => {
+  it("builds vitals with percent, the system label key and the monitor", () => {
     const view = buildPanelView(
       snap({ hp: { value: 12, max: 35 }, woundState: "seriouslyWounded" }),
     );
-    expect(view.vitals).toEqual({
+    expect(view.vitals).toMatchObject({
       state: "seriouslyWounded",
       stateLabelKey: "CPR.global.woundState.seriouslyWounded",
       hp: { value: 12, max: 35, percent: 34 },
+      monitor: { state: "seriouslyWounded", bpm: 128, flatline: false },
     });
   });
 
-  it("labels the dead state with the module key", () => {
-    expect(buildPanelView(snap({ dead: true })).vitals.stateLabelKey).toBe("CCP.Vital.Dead");
+  it("labels the dead state with the module key and flatlines", () => {
+    const vitals = buildPanelView(snap({ dead: true })).vitals;
+    expect(vitals.stateLabelKey).toBe("CCP.Vital.Dead");
+    expect(vitals.monitor.flatline).toBe(true);
   });
 
   it("keeps HP null when unavailable", () => {
-    expect(buildPanelView(snap({ hp: null, woundState: null })).vitals).toEqual({
+    expect(buildPanelView(snap({ hp: null, woundState: null })).vitals).toMatchObject({
       state: "unknown",
       stateLabelKey: "CCP.Vital.Unknown",
       hp: null,
+    });
+  });
+
+  it("shows humanity only for characters, like the native sheets", () => {
+    expect(buildPanelView(snap()).vitals.humanity).toEqual({ value: 32, max: 40 });
+    expect(buildPanelView(snap({ actorType: "mook" })).vitals.humanity).toBeNull();
+  });
+
+  it("flags which LUCK buttons can act", () => {
+    expect(buildPanelView(snap({ luck: { value: 0, max: 6 } })).vitals.luck).toMatchObject({
+      canSpend: false,
+      canRecover: true,
+    });
+    expect(buildPanelView(snap({ luck: { value: 6, max: 6 } })).vitals.luck).toMatchObject({
+      canSpend: true,
+      canRecover: false,
     });
   });
 });

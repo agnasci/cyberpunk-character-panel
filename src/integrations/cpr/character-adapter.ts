@@ -1,4 +1,4 @@
-import type { CharacterSnapshot } from "../../domain/character";
+import type { CharacterSnapshot, DeathSaveSnapshot, Pool } from "../../domain/character";
 
 type Bag = Record<string, unknown>;
 
@@ -14,11 +14,18 @@ function str(value: unknown): string | null {
   return typeof value === "string" ? value : null;
 }
 
-function readHp(system: Bag | null): CharacterSnapshot["hp"] {
-  const hp = bag(bag(system?.derivedStats)?.hp);
-  const value = num(hp?.value);
-  const max = num(hp?.max);
+function readPool(source: unknown): Pool | null {
+  const pool = bag(source);
+  const value = num(pool?.value);
+  const max = num(pool?.max);
   return value === null || max === null ? null : { value, max };
+}
+
+function readDeathSave(derived: Bag | null): DeathSaveSnapshot | null {
+  const ds = bag(derived?.deathSave);
+  const value = num(ds?.value);
+  if (value === null) return null;
+  return { value, penalty: num(ds?.penalty) ?? 0, basePenalty: num(ds?.basePenalty) ?? 0 };
 }
 
 function readRole(actor: Actor, system: Bag | null): CharacterSnapshot["role"] {
@@ -34,6 +41,7 @@ export function readCharacterSnapshot(
   token: TokenDocument | null,
 ): CharacterSnapshot {
   const system = bag(actor.system);
+  const derived = bag(system?.derivedStats);
   return {
     actorUuid: actor.uuid,
     actorType: actor.type,
@@ -41,9 +49,12 @@ export function readCharacterSnapshot(
     img: actor.img,
     aliasHtml: str(bag(system?.information)?.alias) ?? "",
     role: readRole(actor, system),
-    hp: readHp(system),
-    woundState: str(bag(system?.derivedStats)?.currentWoundState),
+    hp: readPool(derived?.hp),
+    woundState: str(derived?.currentWoundState),
     dead: actor.statuses.has("dead"),
+    humanity: readPool(derived?.humanity),
+    luck: readPool(bag(system?.stats)?.luck),
+    deathSave: readDeathSave(derived),
     canEdit: actor.isOwner,
   };
 }

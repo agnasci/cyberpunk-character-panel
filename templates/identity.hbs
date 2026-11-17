@@ -1,8 +1,11 @@
 <section class="ccp-identity">
   {{#if hasSubject}}
-  <button type="button" class="ccp-portrait ccp-chamfer" data-action="openSheet" aria-label="{{localize 'CCP.Panel.OpenSheet'}}" data-tooltip="{{localize 'CCP.Panel.OpenSheet'}}">
-    <img src="{{identity.img}}" alt="">
-  </button>
+  <div class="ccp-portrait-wrap">
+    <button type="button" class="ccp-portrait ccp-chamfer" data-action="openSheet" aria-label="{{localize 'CCP.Panel.OpenSheet'}}" data-tooltip="{{localize 'CCP.Panel.OpenSheet'}}">
+      <img src="{{identity.img}}" alt="">
+    </button>
+    <i class="ccp-ring" aria-hidden="true"></i>
+  </div>
   <div class="ccp-id-text">
     <div class="ccp-name">{{identity.name}}</div>
     {{#if identity.alias}}<div class="ccp-alias">{{identity.alias}}</div>{{/if}}

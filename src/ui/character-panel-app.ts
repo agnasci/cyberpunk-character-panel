@@ -2,6 +2,14 @@ import { MODULE_ID } from "../constants";
 import { ALL_PARTS, type PanelPart } from "../domain/panel-parts";
 import { sameSubject } from "../domain/subject";
 import { buildPanelView } from "../domain/view-model";
+import { parseHpEntry, stepHp, stepLuck } from "../domain/vital-limits";
+import {
+  increaseDeathPenalty,
+  resetDeathPenalty,
+  rollDeathSave,
+  setHp,
+  setLuck,
+} from "../integrations/cpr/character-actions";
 import { readCharacterSnapshot } from "../integrations/cpr/character-adapter";
 import type { ResolvedSubject } from "../integrations/cpr/subject-resolver";
 import { type PanelSettings, saveCollapsed } from "../settings";
@@ -19,6 +27,12 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
     actions: {
       openSheet: CharacterPanelApp.#onOpenSheet,
       toggleCollapse: CharacterPanelApp.#onToggleCollapse,
+      stepHp: CharacterPanelApp.#onStepHp,
+      editHp: CharacterPanelApp.#onEditHp,
+      adjustLuck: CharacterPanelApp.#onAdjustLuck,
+      rollDeathSave: CharacterPanelApp.#onRollDeathSave,
+      increaseDeathPenalty: CharacterPanelApp.#onIncreaseDeathPenalty,
+      resetDeathPenalty: CharacterPanelApp.#onResetDeathPenalty,
     },
   };
 
@@ -31,11 +45,14 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
   #resolved: ResolvedSubject | null = null;
   #settings: PanelSettings;
   #pending = new Set<PanelPart>();
+  #queued = new Map<string, number>();
+  #refocus: string | null = null;
   #flush = foundry.utils.debounce(() => void this.#renderPending(), DIRTY_DELAY_MS);
 
   constructor(settings: PanelSettings) {
     super();
     this.#settings = settings;
+    document.addEventListener("visibilitychange", () => this.#applyMotion());
   }
 
   get subject(): ResolvedSubject | null {
@@ -95,6 +112,21 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
     return { hasSubject: true, ...view };
   }
 
+  protected override _syncPartState(
+    partId: string,
+    newElement: HTMLElement,
+    priorElement: HTMLElement,
+    state: Record<string, unknown>,
+  ): void {
+    super._syncPartState(partId, newElement, priorElement, state);
+    if (partId !== "vitals") return;
+    const prior = priorElement.querySelector<HTMLElement>(".ccp-monitor");
+    const next = newElement.querySelector<HTMLElement>(".ccp-monitor");
+    if (prior && next && prior.dataset.state === next.dataset.state) {
+      next.replaceWith(prior);
+    }
+  }
+
   protected override _insertElement(element: HTMLElement): void {
     document.getElementById(element.id)?.remove();
     this.#place(element);
@@ -109,6 +141,13 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
     const vitals = context.vitals as { state?: string } | undefined;
     if (vitals?.state) this.element.dataset.vital = vitals.state;
     this.#applyRootState(context.hasSubject === true);
+    if (this.#refocus) {
+      const target = document.getElementById(this.#refocus);
+      if (target) {
+        this.#refocus = null;
+        target.focus();
+      }
+    }
   }
 
   #place(element: HTMLElement): void {
@@ -127,6 +166,7 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
     root.classList.toggle("ccp-collapsed", this.#settings.collapsed);
     root.classList.toggle("ccp-dock-top", this.#settings.dock === "top");
     root.style.setProperty("--ccp-scale", String(this.#settings.scale));
+    this.#applyMotion();
     const toggle = root.querySelector<HTMLElement>("[data-action='toggleCollapse']");
     if (toggle) {
       const key = this.#settings.collapsed ? "CCP.Panel.Expand" : "CCP.Panel.Collapse";
@@ -136,11 +176,117 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
     }
   }
 
+  #applyMotion(): void {
+    const root = this.element;
+    if (!root) return;
+    root.classList.toggle("ccp-still", !this.#settings.animateMonitor);
+    root.classList.toggle("ccp-paused", document.hidden);
+  }
+
+  #actor(): Actor | null {
+    const actor = this.#resolved?.actor ?? null;
+    return actor?.isOwner ? actor : null;
+  }
+
+  #openHpEntry(button: HTMLElement): void {
+    const actor = this.#actor();
+    const hp = actor ? readCharacterSnapshot(actor, null).hp : null;
+    if (!actor || !hp) return;
+    const input = document.createElement("input");
+    input.type = "text";
+    input.inputMode = "numeric";
+    input.id = "ccp-hp-input";
+    input.className = "ccp-hp-input";
+    input.value = String(hp.value);
+    input.setAttribute("aria-label", button.getAttribute("aria-label") ?? "");
+    let done = false;
+    const finish = async (commit: boolean, refocus: boolean) => {
+      if (done) return;
+      done = true;
+      if (refocus) this.#refocus = button.id;
+      const next = commit ? parseHpEntry(input.value, hp.value, hp.max) : null;
+      const changed = next !== null && next !== hp.value && (await setHp(actor, next));
+      if (!changed) await this.render({ parts: ["vitals"] });
+    };
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") void finish(true, true);
+      else if (event.key === "Escape") void finish(false, true);
+      else return;
+      event.preventDefault();
+      event.stopPropagation();
+    });
+    input.addEventListener("blur", () => void finish(true, false));
+    button.replaceWith(input);
+    input.focus();
+    input.select();
+  }
+
   static #onOpenSheet(this: CharacterPanelApp): void {
     this.#resolved?.actor.sheet?.render(true);
   }
 
   static async #onToggleCollapse(this: CharacterPanelApp): Promise<void> {
     await this.toggleCollapsed();
+  }
+
+  async #queue(
+    key: string,
+    current: number,
+    next: (base: number) => number,
+    write: (value: number) => Promise<unknown>,
+  ): Promise<void> {
+    const value = next(this.#queued.get(key) ?? current);
+    this.#queued.set(key, value);
+    try {
+      await write(value);
+    } finally {
+      if (this.#queued.get(key) === value) this.#queued.delete(key);
+    }
+  }
+
+  static async #onStepHp(this: CharacterPanelApp, _event: Event, target: HTMLElement) {
+    const actor = this.#actor();
+    const hp = actor ? readCharacterSnapshot(actor, null).hp : null;
+    if (!actor || !hp) return;
+    const delta = Number(target.dataset.delta);
+    await this.#queue(
+      `hp:${actor.uuid}`,
+      hp.value,
+      (base) => stepHp(base, delta, hp.max),
+      (value) => setHp(actor, value),
+    );
+  }
+
+  static #onEditHp(this: CharacterPanelApp, _event: Event, target: HTMLElement): void {
+    this.#openHpEntry(target);
+  }
+
+  static async #onAdjustLuck(this: CharacterPanelApp, _event: Event, target: HTMLElement) {
+    const actor = this.#actor();
+    const luck = actor ? readCharacterSnapshot(actor, null).luck : null;
+    if (!actor || !luck) return;
+    const delta = Number(target.dataset.delta);
+    await this.#queue(
+      `luck:${actor.uuid}`,
+      luck.value,
+      (base) => stepLuck(base, delta, luck.max),
+      (value) => setLuck(actor, value),
+    );
+  }
+
+  static async #onRollDeathSave(this: CharacterPanelApp, event: Event): Promise<void> {
+    const actor = this.#actor();
+    const mouse = event as MouseEvent;
+    if (actor) await rollDeathSave(actor, { ctrlKey: mouse.ctrlKey, metaKey: mouse.metaKey });
+  }
+
+  static async #onIncreaseDeathPenalty(this: CharacterPanelApp): Promise<void> {
+    const actor = this.#actor();
+    if (actor) await increaseDeathPenalty(actor);
+  }
+
+  static async #onResetDeathPenalty(this: CharacterPanelApp): Promise<void> {
+    const actor = this.#actor();
+    if (actor) await resetDeathPenalty(actor);
   }
 }

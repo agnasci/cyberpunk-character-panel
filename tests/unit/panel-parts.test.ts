@@ -39,3 +39,11 @@ describe("other document changes", () => {
     expect(partsForTokenChange(["x", "y"])).toEqual([]);
   });
 });
+
+describe("E2 vital sources", () => {
+  it("re-renders vitals for LUCK and critical injuries", () => {
+    expect(partsForActorChange(["system.stats.luck.value"])).toEqual(["vitals"]);
+    expect(partsForActorChange(["system.stats.ref.value"])).toEqual([]);
+    expect(partsForItemChange("criticalInjury")).toEqual(["vitals"]);
+  });
+});

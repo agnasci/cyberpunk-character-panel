@@ -52,3 +52,23 @@ describe("readCharacterSnapshot", () => {
     expect(snap.hp).toBeNull();
   });
 });
+
+describe("readCharacterSnapshot pools", () => {
+  it("reads humanity, LUCK and death save", () => {
+    const snap = readCharacterSnapshot(
+      fakeActor({
+        humanity: { value: -3, max: 40 },
+        luck: { value: 2, max: 6 },
+        deathSave: { value: 3, penalty: 2, basePenalty: 1 },
+      }),
+      null,
+    );
+    expect(snap.humanity).toEqual({ value: -3, max: 40 });
+    expect(snap.luck).toEqual({ value: 2, max: 6 });
+    expect(snap.deathSave).toEqual({ value: 3, penalty: 2, basePenalty: 1 });
+  });
+
+  it("keeps death save null when the sheet has none", () => {
+    expect(readCharacterSnapshot(fakeActor({ deathSave: null }), null).deathSave).toBeNull();
+  });
+});
