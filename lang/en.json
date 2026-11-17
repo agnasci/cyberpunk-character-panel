@@ -1,0 +1,4 @@
+{
+  "CCP.Compat.WrongSystem": "Character Panel requires the Cyberpunk RED – CORE system.",
+  "CCP.Compat.UntestedVersion": "Character Panel was tested with Cyberpunk RED – CORE {tested}; this world uses {found}."
+}
