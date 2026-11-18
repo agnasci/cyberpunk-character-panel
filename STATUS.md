@@ -87,7 +87,7 @@ Estados: `TODO`. Uma tarefa por vez; detalhe em docs/PLAN.md.
 
 | ID | Estado | Entrega | Condição |
 |---|---|---|---|
-| E6-01 | TODO | API v1 (D12): `getSubject`, slots, hooks, paleta | Pode começar |
+| E6-01 | TODO | API v1 (D12): `getSubject`, slots, hooks, paleta | Pode começar; consumidor planejado em `D:\Desenvolvimento\cyberpunk-combat-kit` (pedidos na seção "Integração com o Character Panel" do docs/ARCHITECTURE.md de lá) |
 | E6-02 | TODO | `docs/INTEGRATION.md` para o módulo de combate | Depois de E6-01 |
 
 ## Pendências abertas
