@@ -1,5 +1,6 @@
 <section class="ccp-dock">
   {{#if hasSubject}}
+  <div class="ccp-slot-region ccp-slot-quick" data-ccp-slot-region="quick" hidden></div>
   <button type="button" id="ccp-key-style" class="ccp-tab ccp-tab-icon ccp-style-btn" data-action="toggleDrawer" data-drawer="style" aria-label="{{localize 'CCP.Style.Open'}}" data-tooltip="{{localize 'CCP.Style.Open'}}" aria-controls="ccp-drawer" aria-expanded="{{#if styleOpen}}true{{else}}false{{/if}}">
     <i class="fa-solid fa-palette" aria-hidden="true"></i>
   </button>

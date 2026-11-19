@@ -55,6 +55,7 @@ agente decidisse pelas regras oficiais e pelo funcionamento do sistema; motivo r
 | D43 | Pedido do usuário (2026-11-17) | Aba aberta só destaca o ícone (fundo na cor de destaque), sem crescer nem mostrar o nome (ajusta D29) | Mostrar o nome deslocava as abas e era desnecessário |
 | D44 | Pedido do usuário (2026-11-17) | Célula de Death Save no painel só em `mortallyWounded` (HP < 1); ferimento grave e penalidade acima de 0 não a mostram mais (ajusta D30). O cabeçalho da gaveta Saúde continua com rolar/aumentar/zerar sempre, em alerta só no ferimento mortal | O Death Save só se rola com ferimento mortal; a célula no ferimento grave (laranja) confundia |
 | D45 | Pedido do usuário (2026-11-17) | Gaveta Saúde ganha busca por texto (sem acento, sem caixa) sobre lesões, drogas, efeitos (nome e origem) e status do token; seções sem resultado somem e, sem nenhum, aparece aviso. Cada gaveta guarda a própria busca até trocar de personagem | Status do token são só ícones; achar uma condição pelo nome era difícil |
+| D46 | Proposta (2026-11-18) | API v1 (E6-01): slots validados no domínio e montados depois de cada render da parte; `bar-end` no fim das abas, `quick` no dock (visível recolhido), `drawer` como aba extra com gaveta própria; ações por `data-slot-action` com o evento original; render pode devolver nó ou HTML; erro num slot só vai para o console | Pedidos do Combat Kit (região `quick` recolhida, evento com modificadores); o painel não conhece as regras do outro módulo |
 
 ## Formato de nova decisão
 

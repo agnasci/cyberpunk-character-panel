@@ -85,6 +85,7 @@ declare global {
 
   const Hooks: {
     once(hook: "init" | "ready", fn: () => void): number;
+    callAll(hook: string, ...args: unknown[]): boolean;
     on(hook: "canvasReady", fn: () => void): number;
     on(hook: "controlToken", fn: (token: FoundryToken, controlled: boolean) => void): number;
     on(hook: "updateUser", fn: ChangeHook<FoundryUser>): number;

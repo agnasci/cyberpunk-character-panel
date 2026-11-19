@@ -51,7 +51,8 @@ de combate) entra na E6.
 ## API pública para o módulo de combate (E6)
 
 Exposta em `game.modules.get("cyberpunk-character-panel").api` e anunciada por
-`Hooks.callAll("ccpReady", api)`. Proposta de contrato v1:
+`Hooks.callAll("ccpReady", api)` no `ready`, logo depois de criar o painel. Contrato v1
+implementado na E6-01 (D46):
 
 | Membro | Função |
 |---|---|
@@ -66,6 +67,27 @@ Exposta em `game.modules.get("cyberpunk-character-panel").api` e anunciada por
 
 Regras: conteúdo injetado vive dentro de um contêiner com a classe do slot; o painel não
 interpreta nem valida regras do outro módulo; erro num slot não derruba o painel.
+
+Como ficou (código em `src/domain/slots.ts`, `src/ui/slot-host.ts`, `src/api/panel-api.ts`):
+
+- `registerSlot` devolve `true`/`false` (aviso no console com o motivo). Campos: `id`
+  (`[a-z0-9-]`, até 48), `region`, `order` (padrão 0; empate pelo id), `render(context)`,
+  `onAction?(action, event, context)`, `label` (obrigatório na `drawer`, até 40) e `icon`
+  (classes Font Awesome; padrão `fa-solid fa-puzzle-piece`). Registrar de novo o mesmo id
+  substitui.
+- `render` devolve um `Node` ou uma string HTML (ou nada). `context` = `{region, subject,
+  palette, container}`. Roda a cada render da parte que contém a região; quem injeta pede
+  `requestRender(["quick"])` quando os próprios dados mudam.
+- Ações: qualquer elemento com `data-slot-action="nome"` dentro do slot chama `onAction` com o
+  evento original (Shift/Ctrl disponíveis).
+- Regiões: `bar-end` no fim da linha de abas (parte `actions`); `quick` no dock, visível também
+  com o painel recolhido (parte `dock`); `drawer` vira uma aba na linha de abas que abre a
+  gaveta com o título e o conteúdo do slot (partes `actions` e `drawer`). Remover o slot fecha
+  a gaveta dele. Região sem slot fica escondida.
+- `getSubject()` devolve `{actor, token, reason}` congelado ou `null`; o mesmo objeto vai no hook
+  `ccpSubjectChanged`. `getPalette()` devolve `accent`, `accentStrong`, `accentSoft`,
+  `accentLine`, `accentInk` e `variables` (as variáveis `--ccp-*`), já com a prévia do editor
+  de cor se houver. `ccpRendered(app, parts)` vem depois de cada render.
 
 ## Persistência
 

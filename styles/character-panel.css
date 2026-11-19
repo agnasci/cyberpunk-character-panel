@@ -2204,3 +2204,27 @@
     opacity: 0.75;
   }
 }
+
+.ccp-panel .ccp-slot-region {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  min-width: 0;
+}
+
+.ccp-panel.ccp-dock-top .ccp-slot-region {
+  align-items: flex-start;
+}
+
+.ccp-panel .ccp-slot-drawer {
+  display: block;
+  padding: 6px 10px 10px;
+}
+
+.ccp-panel .ccp-slot {
+  display: contents;
+}
+
+.ccp-panel .ccp-slot-drawer > .ccp-slot {
+  display: block;
+}

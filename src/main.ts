@@ -13,7 +13,9 @@ import {
   registerSettings,
   restorePlayerPrefs,
 } from "./settings";
+import { createPanelApi } from "./api/panel-api";
 import { CharacterPanelApp } from "./ui/character-panel-app";
+import { SlotHost } from "./ui/slot-host";
 
 const SUBJECT_DELAY_MS = 50;
 
@@ -58,7 +60,12 @@ Hooks.once("ready", async () => {
     );
   }
   await restorePlayerPrefs();
-  app = new CharacterPanelApp(readSettings());
+  const slots = new SlotHost();
+  app = new CharacterPanelApp(readSettings(), slots);
+  const api = createPanelApi(() => app, slots);
+  const module = game.modules.get(MODULE_ID);
+  if (module) module.api = api;
+  Hooks.callAll("ccpReady", api);
   refreshSubject();
 
   Hooks.on("canvasReady", () => refreshSubject());

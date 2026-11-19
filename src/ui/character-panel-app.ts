@@ -48,6 +48,8 @@ import {
 } from "../domain/quick-sheet";
 import type { ResolvedSubject } from "../integrations/cpr/subject-resolver";
 import { buildPalette, normalizeHex, paletteVariables } from "../domain/palette";
+import { partsForRegions } from "../domain/slots";
+import type { PanelPalette, PanelSubject, SlotHost } from "./slot-host";
 import { buildStyleView, styleNote } from "../domain/style-view";
 import {
   type PanelSettings,
@@ -105,6 +107,7 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
       saveWorldAccent: CharacterPanelApp.#onSaveWorldAccent,
       togglePref: CharacterPanelApp.#onTogglePref,
       setDock: CharacterPanelApp.#onSetDock,
+      toggleSlotDrawer: CharacterPanelApp.#onToggleSlotDrawer,
     },
   };
 
@@ -122,6 +125,8 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
 
   #resolved: ResolvedSubject | null = null;
   #settings: PanelSettings;
+  #slots: SlotHost;
+  #slotDrawer: string | null = null;
   #pending = new Set<PanelPart>();
   #queued = new Map<string, number>();
   #refocus: string | null = null;
@@ -134,14 +139,44 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
   #observedParent: HTMLElement | null = null;
   #flush = foundry.utils.debounce(() => void this.#renderPending(), DIRTY_DELAY_MS);
 
-  constructor(settings: PanelSettings) {
+  constructor(settings: PanelSettings, slots: SlotHost) {
     super();
     this.#settings = settings;
+    this.#slots = slots;
     document.addEventListener("visibilitychange", () => this.#applyMotion());
   }
 
   get subject(): ResolvedSubject | null {
     return this.#resolved;
+  }
+
+  subjectView(): PanelSubject | null {
+    const resolved = this.#resolved;
+    if (!resolved) return null;
+    return Object.freeze({
+      actor: resolved.actor,
+      token: resolved.token,
+      reason: resolved.subject.reason,
+    });
+  }
+
+  palette(): PanelPalette {
+    const palette = buildPalette(this.#preview ?? this.#settings.accent);
+    return {
+      accent: palette.accent,
+      accentStrong: palette.accentStrong,
+      accentSoft: palette.accentSoft,
+      accentLine: palette.accentLine,
+      accentInk: palette.accentInk,
+      variables: paletteVariables(palette),
+    };
+  }
+
+  async requestRender(regions?: readonly unknown[]): Promise<void> {
+    if (this.#slotDrawer && !this.#slots.get(this.#slotDrawer)) this.#slotDrawer = null;
+    if (!this.rendered) return;
+    const parts = partsForRegions(regions);
+    if (parts.length > 0) await this.render({ parts });
   }
 
   isSubjectActor(actor: Actor | null | undefined): boolean {
@@ -168,9 +203,11 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
     this.#resolved = resolved;
     if (changed) {
       this.#drawer = null;
+      this.#slotDrawer = null;
       this.#queries = { skills: "", health: "" };
       this.#favScroll = 0;
     }
+    if (changed) Hooks.callAll("ccpSubjectChanged", this.subjectView());
     if (!this.#settings.enabled) return;
     if (!this.rendered) await this.render(true);
     else if (changed) await this.render({ parts: [...ALL_PARTS] });
@@ -219,9 +256,20 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
         net: readNet(actor),
         ledgers: readLedgers(actor),
       });
-      return { ...base, actions };
+      const slotTabs = this.#slots.list("drawer").map((slot) => ({
+        id: slot.id,
+        label: slot.label ?? slot.id,
+        icon: slot.icon,
+        open: slot.id === this.#slotDrawer,
+      }));
+      return { ...base, actions, slotTabs };
     }
     if (partId === "drawer") {
+      const slot = this.#slotDrawer ? this.#slots.get(this.#slotDrawer) : null;
+      if (slot) {
+        const view = { id: slot.id, label: slot.label ?? slot.id, icon: slot.icon };
+        return { ...base, drawer: { open: "slot", slot: view } };
+      }
       const open = this.#drawer;
       const drawer = buildDrawerView(open, {
         skills: open === "skills" ? readSkills(actor) : undefined,
@@ -279,6 +327,8 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
     this.#bindFavorites();
     this.#bindStyleEditor();
     this.#observeWidth();
+    this.#slots.mount(this.element, { subject: this.subjectView(), palette: this.palette() });
+    Hooks.callAll("ccpRendered", this, options.parts ?? [...ALL_PARTS]);
     if (this.#refocus) {
       const target = document.getElementById(this.#refocus);
       if (target) {
@@ -645,6 +695,7 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
     const id = target.dataset.drawer as DrawerId | undefined;
     if (!id) return;
     this.#drawer = this.#drawer === id ? null : id;
+    this.#slotDrawer = null;
     if (this.#drawer !== "style" && this.#preview !== null) {
       this.#preview = null;
       this.#applyPalette(this.#settings.accent);
@@ -768,6 +819,19 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
     if (!key || key === "dock") return;
     this.#refocus = target.id;
     await savePreference(key, !this.#settings[key]);
+  }
+
+  static async #onToggleSlotDrawer(this: CharacterPanelApp, _event: Event, target: HTMLElement) {
+    const id = target.dataset.slotId;
+    if (!id || !this.#slots.get(id)) return;
+    this.#slotDrawer = this.#slotDrawer === id ? null : id;
+    this.#drawer = null;
+    if (this.#preview !== null) {
+      this.#preview = null;
+      this.#applyPalette(this.#settings.accent);
+    }
+    this.#refocus = target.id;
+    await this.render({ parts: ["drawer", "actions", "dock"] });
   }
 
   static async #onSetDock(this: CharacterPanelApp, _event: Event, target: HTMLElement) {

@@ -199,4 +199,8 @@
     </div>
   </div>
   {{/if}}
+  {{#if drawer.slot}}
+  <header><h2><i class="{{drawer.slot.icon}}" aria-hidden="true"></i>{{drawer.slot.label}}</h2></header>
+  <div class="ccp-slot-region ccp-slot-drawer" data-ccp-slot-region="drawer" data-slot-id="{{drawer.slot.id}}"></div>
+  {{/if}}
 </section>

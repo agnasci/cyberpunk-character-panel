@@ -1,6 +1,6 @@
 # Estado e passagem de contexto
 
-Atualizado em: 2026-11-17.
+Atualizado em: 2026-11-18.
 
 ## Situação
 
@@ -13,27 +13,26 @@ Atualizado em: 2026-11-17.
   Sem página no site do Foundry ainda.
 - Repositório privado: <https://github.com/agnasci/cyberpunk-character-panel> (`main`); E4 em `2f31f4c`.
 
-## Última entrega: FIX-01 — Death Save e busca na Saúde (2026-11-17)
+## Última entrega: E6-01 — API v1 para o módulo de combate (2026-11-18)
 
-Objetivo: célula de Death Save só com ferimento mortal (D44) e busca por texto na gaveta Saúde
-(D45). Aceite: célula some com HP laranja e com penalidade > 0 fora do ferimento mortal; busca
-filtra lesões, drogas, efeitos e status do token pelo nome, sem acento/caixa; `npm run check` passa.
+Objetivo: `getSubject`, slots (`bar-end`, `quick`, `drawer`), `requestRender`, `getPalette` e
+hooks `ccpReady`, `ccpSubjectChanged`, `ccpRendered` (D12, D46). Aceite: um módulo de teste injeta
+um bloco e recebe a troca de personagem.
 
-Arquivos: `src/domain/view-model.ts`, `src/domain/panel-views.ts`, `src/ui/character-panel-app.ts`
-(busca genérica por `data-search-for` / `data-search` / `data-search-group`), `templates/drawer.hbs`,
-`styles/character-panel.css`, `lang/*.json`, testes de view-model e panel-views, docs.
+Arquivos: `src/domain/slots.ts`, `src/ui/slot-host.ts`, `src/api/panel-api.ts` (novos);
+`src/ui/character-panel-app.ts`, `src/main.ts`, `templates/actions.hbs`, `dock.hbs`,
+`drawer.hbs`, `styles/character-panel.css`, tipos, `tests/unit/slots.test.ts`, docs.
 
 Validação:
-- `npm run check` exit 0 (92 testes).
-- Manual real (Foundry 12.343, mundo Cyberdeck HUD, jogador Runner Teste, viewport 1024 px): com
-  `basePenalty` 1, HP 40 e 15 (laranja) sem célula de Death Save; HP 1 sem célula e sem alerta; HP 0
-  (mortal) com célula vermelha e alerta no cabeçalho da Saúde. Busca na Saúde: "SHIELD" deixa 4
-  status e esconde as outras seções; "lesao" acha "CCP Teste Lesão"; "xyz" mostra o aviso; Esc
-  volta aos 38 itens; com "bl" digitado, atualizar o HP manteve foco, texto e filtro; a busca
-  continua lá ao trocar de gaveta e voltar. Perícias: "PERCEP" deixa 2 em 2 grupos; "qqq" mostra o
-  aviso; Esc volta às 63. Estado restaurado (HP 40, gaveta fechada).
-- Não testado: largura cheia (cabeçalho da Saúde com busca e Death Save lado a lado), busca pela
-  origem de um efeito no Foundry (só no teste unitário), mestre.
+- `npm run check` exit 0 (97 testes; 5 novos de slots).
+- Manual real (Foundry 12.343, mundo `cyberdeck-hud`, Gamemaster, pelo console do navegador
+  do app): `api.version` 1 e paleta com as variáveis; slots de teste nas três regiões
+  mostraram o nome do ator; trocar o token controlado mudou o conteúdo e disparou
+  `ccpSubjectChanged` duas vezes (Atirador, PdM); id inválido recusado (`false`); slot que lança
+  erro ficou vazio sem quebrar o painel; clique real na aba do slot abriu a gaveta com título e
+  conteúdo; Shift + clique no botão do slot chamou `onAction("ping")` com `shiftKey`;
+  `unregisterSlot` tirou a aba e fechou a gaveta; recolhido, a região `quick` continuou visível.
+- Não testado: jogador, encaixe em cima, largura estreita com slots, leitor de tela.
 
 ## Entrega anterior: UI-R1 — redesenho da interface (2026-11-17)
 
@@ -87,8 +86,7 @@ Estados: `TODO`. Uma tarefa por vez; detalhe em docs/PLAN.md.
 
 | ID | Estado | Entrega | Condição |
 |---|---|---|---|
-| E6-01 | TODO | API v1 (D12): `getSubject`, slots, hooks, paleta | Pode começar; consumidor planejado em `D:\Desenvolvimento\cyberpunk-combat-kit` (pedidos na seção "Integração com o Character Panel" do docs/ARCHITECTURE.md de lá) |
-| E6-02 | TODO | `docs/INTEGRATION.md` para o módulo de combate | Depois de E6-01 |
+| E6-02 | TODO | `docs/INTEGRATION.md` para o módulo de combate | Pode começar; consumidor em `D:\Desenvolvimento\cyberpunk-combat-kit` (E7 de lá) |
 
 ## Pendências abertas
 
