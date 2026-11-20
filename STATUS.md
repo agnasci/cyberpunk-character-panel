@@ -8,7 +8,7 @@ Atualizado em: 2026-11-20.
   com editor próprio, cor padrão do mundo definida pelo mestre e preferências de layout.
 - Leiaute redesenhado em 2026-11-17 (D29–D43), validado pelo usuário em iterações no Foundry; o
   protótipo E0-03 (`prototype/panel.html`) ficou como referência histórica.
-- **v0.1.0 (beta) publicada em 2026-11-17** no GitHub, repositório tornado público; **v0.1.1** (FIX-01) no mesmo dia; **v0.2.0** em 2026-11-19 com a API v1 (E6-01), exigida pela aba "Combate" do Combat Kit 0.1.0. Manifesto:
+- **v0.1.0 (beta) publicada em 2026-11-17** no GitHub, repositório tornado público; **v0.1.1** (FIX-01) no mesmo dia; **v0.2.0** em 2026-11-19 com a API v1 (E6-01), exigida pela aba "Combate" do Combat Kit 0.1.0; **v0.2.1** em 2026-11-20 com `setAttention` (D47). Manifesto:
   <https://github.com/agnasci/cyberpunk-character-panel/releases/latest/download/module.json>.
   Sem página no site do Foundry ainda.
 - Repositório público: <https://github.com/agnasci/cyberpunk-character-panel> (`main`).
@@ -25,8 +25,7 @@ Atualizado em: 2026-11-20.
   `cyberdeck-hud`, Gamemaster, com o Combat Kit): o destaque ligou no turno do token exibido,
   desligou no seguinte e acompanhou a troca de token; borda acesa conferida em captura.
 - Não testado: jogador; recolhido; encaixe em cima; movimento reduzido real.
-- **Sem release**: a v0.2.0 publicada não tem `setAttention`; o Combat Kit pede 0.2.1+. Publicar
-  quando o usuário pedir.
+- Publicado na release v0.2.1 (2026-11-20).
 
 ## Entrega anterior: E6-01 — API v1 para o módulo de combate (2026-11-18)
 
