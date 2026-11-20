@@ -62,6 +62,7 @@ implementado na E6-01 (D46):
 | `unregisterSlot(id)` | Remove |
 | `requestRender(regions?)` | Pede render das partes do painel |
 | `getPalette()` | Variáveis de cor atuais, para o outro módulo combinar com o tema |
+| `setAttention(source, active)` | Liga ou desliga um destaque (borda pulsando) pedido por outro módulo; acréscimo à v1 (D47) |
 | Hook `ccpSubjectChanged(subject)` | Avisa troca de personagem |
 | Hook `ccpRendered(app, parts)` | Depois de cada render |
 
@@ -88,6 +89,11 @@ Como ficou (código em `src/domain/slots.ts`, `src/ui/slot-host.ts`, `src/api/pa
   `ccpSubjectChanged`. `getPalette()` devolve `accent`, `accentStrong`, `accentSoft`,
   `accentLine`, `accentInk` e `variables` (as variáveis `--ccp-*`), já com a prévia do editor
   de cor se houver. `ccpRendered(app, parts)` vem depois de cada render.
+- `setAttention(source, active)` (D47): `source` é um id `[a-z0-9.-]` de até 64 caracteres
+  (ex.: `cyberpunk-combat-kit.turn`); devolve `false` com aviso no console se for inválido. O
+  destaque fica ligado enquanto houver ao menos uma origem ativa e não depende de render. O
+  painel não sabe o motivo (turno é do módulo de combate, D03); quem liga deve desligar.
+  Quem usa testa `typeof api.setAttention === "function"`, porque a v0.2.0 não tem.
 
 ## Persistência
 

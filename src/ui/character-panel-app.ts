@@ -139,6 +139,8 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
   #observedParent: HTMLElement | null = null;
   #flush = foundry.utils.debounce(() => void this.#renderPending(), DIRTY_DELAY_MS);
 
+  #attention = new Set<string>();
+
   constructor(settings: PanelSettings, slots: SlotHost) {
     super();
     this.#settings = settings;
@@ -177,6 +179,12 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
     if (!this.rendered) return;
     const parts = partsForRegions(regions);
     if (parts.length > 0) await this.render({ parts });
+  }
+
+  setAttention(source: string, active: boolean): void {
+    if (active) this.#attention.add(source);
+    else this.#attention.delete(source);
+    this.#applyAttention();
   }
 
   isSubjectActor(actor: Actor | null | undefined): boolean {
@@ -544,6 +552,7 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
     root.classList.toggle("ccp-no-bpm", !this.#settings.showBpm);
     this.#applyPalette(this.#preview ?? this.#settings.accent);
     this.#applyMotion();
+    this.#applyAttention();
     const toggle = root.querySelector<HTMLElement>("[data-action='toggleCollapse']");
     if (toggle) {
       const key = this.#settings.collapsed ? "CCP.Panel.Expand" : "CCP.Panel.Collapse";
@@ -551,6 +560,10 @@ export class CharacterPanelApp extends HandlebarsApplicationMixin(ApplicationV2)
       toggle.setAttribute("aria-expanded", String(!this.#settings.collapsed));
       toggle.dataset.tooltip = game.i18n.localize(key);
     }
+  }
+
+  #applyAttention(): void {
+    this.element?.classList.toggle("ccp-attention", this.#attention.size > 0);
   }
 
   #applyMotion(): void {

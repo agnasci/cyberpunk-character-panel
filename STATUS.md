@@ -1,6 +1,6 @@
 # Estado e passagem de contexto
 
-Atualizado em: 2026-11-18.
+Atualizado em: 2026-11-20.
 
 ## Situação
 
@@ -13,7 +13,22 @@ Atualizado em: 2026-11-18.
   Sem página no site do Foundry ainda.
 - Repositório público: <https://github.com/agnasci/cyberpunk-character-panel> (`main`).
 
-## Última entrega: E6-01 — API v1 para o módulo de combate (2026-11-18)
+## Última entrega: destaque pedido por outro módulo — `setAttention` (2026-11-20)
+
+- Pedido do usuário: aviso de turno no painel (Combat Kit, D44 de lá). D47: `api.setAttention(source,
+  active)` liga a classe `ccp-attention` (borda e brilho pulsando na cor de destaque; parado com
+  animação desligada ou aba oculta, e com movimento reduzido). O painel não conhece turno (D03).
+- Arquivos: `src/domain/slots.ts` (`isAttentionSource`), `src/api/panel-api.ts`,
+  `src/ui/character-panel-app.ts`, `styles/character-panel.css`, `tests/unit/slots.test.ts`,
+  docs/ARCHITECTURE.md, docs/DECISIONS.md.
+- Validação: `npm run check` exit 0 (98 testes). Manual real (Foundry 12.343, mundo
+  `cyberdeck-hud`, Gamemaster, com o Combat Kit): o destaque ligou no turno do token exibido,
+  desligou no seguinte e acompanhou a troca de token; borda acesa conferida em captura.
+- Não testado: jogador; recolhido; encaixe em cima; movimento reduzido real.
+- **Sem release**: a v0.2.0 publicada não tem `setAttention`; o Combat Kit pede 0.2.1+. Publicar
+  quando o usuário pedir.
+
+## Entrega anterior: E6-01 — API v1 para o módulo de combate (2026-11-18)
 
 Objetivo: `getSubject`, slots (`bar-end`, `quick`, `drawer`), `requestRender`, `getPalette` e
 hooks `ccpReady`, `ccpSubjectChanged`, `ccpRendered` (D12, D46). Aceite: um módulo de teste injeta

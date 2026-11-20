@@ -29,6 +29,12 @@ function record(value: unknown): Record<string, unknown> | null {
   return typeof value === "object" && value !== null ? (value as Record<string, unknown>) : null;
 }
 
+const ATTENTION_SOURCE = /^[a-z0-9][a-z0-9.-]{0,63}$/;
+
+export function isAttentionSource(value: unknown): value is string {
+  return typeof value === "string" && ATTENTION_SOURCE.test(value);
+}
+
 export function isRegion(value: unknown): value is SlotRegion {
   return (SLOT_REGIONS as readonly unknown[]).includes(value);
 }

@@ -1,5 +1,5 @@
 import { MODULE_ID } from "../constants";
-import { API_VERSION, isRegion } from "../domain/slots";
+import { API_VERSION, isAttentionSource, isRegion } from "../domain/slots";
 import type { CharacterPanelApp } from "../ui/character-panel-app";
 import type { PanelPalette, PanelSubject, SlotHost } from "../ui/slot-host";
 
@@ -10,6 +10,7 @@ export interface PanelApi {
   unregisterSlot(id: string): void;
   requestRender(regions?: readonly string[]): void;
   getPalette(): PanelPalette | null;
+  setAttention(source: string, active: boolean): boolean;
 }
 
 export function createPanelApi(app: () => CharacterPanelApp | null, slots: SlotHost): PanelApi {
@@ -34,5 +35,13 @@ export function createPanelApi(app: () => CharacterPanelApp | null, slots: SlotH
       rerender(regions?.filter(isRegion));
     },
     getPalette: () => app()?.palette() ?? null,
+    setAttention(source: string, active: boolean): boolean {
+      if (!isAttentionSource(source)) {
+        console.warn(`${MODULE_ID} | setAttention: bad-source`);
+        return false;
+      }
+      app()?.setAttention(source, active === true);
+      return true;
+    },
   });
 }

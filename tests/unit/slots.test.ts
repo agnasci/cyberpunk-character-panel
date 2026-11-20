@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseSlot, partsForRegions, slotsIn } from "../../src/domain/slots";
+import { isAttentionSource, parseSlot, partsForRegions, slotsIn } from "../../src/domain/slots";
 
 const render = () => null;
 
@@ -57,5 +57,14 @@ describe("slots da API v1 (D12)", () => {
     expect(partsForRegions(["drawer", "bar-end"])).toEqual(["actions", "drawer"]);
     expect(partsForRegions(["nada"])).toEqual([]);
     expect(partsForRegions(undefined).sort()).toEqual(["actions", "dock", "drawer"]);
+  });
+
+  it("origem do destaque (setAttention) com id simples", () => {
+    expect(isAttentionSource("cyberpunk-combat-kit.turn")).toBe(true);
+    expect(isAttentionSource("")).toBe(false);
+    expect(isAttentionSource("Turno")).toBe(false);
+    expect(isAttentionSource("<b>")).toBe(false);
+    expect(isAttentionSource("a".repeat(65))).toBe(false);
+    expect(isAttentionSource(7)).toBe(false);
   });
 });
